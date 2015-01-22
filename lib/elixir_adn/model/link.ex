@@ -1,6 +1,6 @@
-defmodule ElixirADN.Model.Links do
+defmodule ElixirADN.Model.Link do
 	@doc ~S"""
-	An elixir representation of the ADN links map found in the User map
+	An elixir representation of the ADN link map found in the User map
 	{
     "len": 7,
     "pos": 31,

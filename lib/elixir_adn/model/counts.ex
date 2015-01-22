@@ -1,4 +1,4 @@
-defmodule ElixirADN.Counts do
+defmodule ElixirADN.Model.Counts do
 	@doc ~S"""
 	An elixir representation of the ADN counts map found in the User map
 	{

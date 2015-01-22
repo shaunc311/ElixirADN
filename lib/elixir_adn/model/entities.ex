@@ -1,4 +1,4 @@
-defmodule ElixirADN.Entities do
+defmodule ElixirADN.Model.Entities do
 	@doc ~S"""
 	An elixir representation of the ADN entities map found in the User map
 	{

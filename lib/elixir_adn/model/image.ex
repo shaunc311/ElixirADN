@@ -1,4 +1,4 @@
-defmodule ElixirADN.Image do
+defmodule ElixirADN.Model.Image do
 	@doc ~S"""
 	An elixir representation of the ADN image map found in the User map
 	{

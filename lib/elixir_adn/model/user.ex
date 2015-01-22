@@ -1,4 +1,4 @@
-defmodule ElixirADN.User do
+defmodule ElixirADN.Model.User do
 	@doc ~S"""
 	An elixir representation of the ADN user map
 	{

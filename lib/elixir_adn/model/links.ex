@@ -1,4 +1,4 @@
-defmodule ElixirADN.Links do
+defmodule ElixirADN.Model.Links do
 	@doc ~S"""
 	An elixir representation of the ADN links map found in the User map
 	{

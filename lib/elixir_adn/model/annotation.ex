@@ -1,4 +1,4 @@
-defmodule ElixirADN.Annotation do
+defmodule ElixirADN.Model.Annotation do
 	@doc ~S"""
 	An elixir representation of the ADN annotation map
 	{

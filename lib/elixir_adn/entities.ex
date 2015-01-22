@@ -1,6 +1,6 @@
 defmodule ElixirADN.Entities do
 	@doc ~S"""
-	An elixir representation of the ADN description map found in the User map
+	An elixir representation of the ADN entities map found in the User map
 	{
     "hashtags": [
 

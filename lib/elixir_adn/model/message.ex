@@ -26,8 +26,10 @@ defmodule ElixirADN.Model.Message do
 	  },
 	  "text": "Hello channel!",
 	  "thread_id": "1",
-	  "user": "...user object..."
+	  "user": "...user object...",
+	  "annotations": []
+
 	}
 	"""
-	defstruct channel_id: "", created_at: "", entities: nil, html: "", id: "", machine_only: false, num_replies: -1, source: nil, text: "", thread_id: "", user: nil
+	defstruct channel_id: "", created_at: "", entities: nil, html: "", id: "", machine_only: false, num_replies: -1, source: nil, text: "", thread_id: "", user: nil, annotations: []
 end

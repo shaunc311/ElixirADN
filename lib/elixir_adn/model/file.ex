@@ -50,8 +50,9 @@ defmodule ElixirADN.Model.File do
 	  "type": "com.example.test",
 	  "url": "https://...",
 	  "url_expires": "2013-01-25T03:00:00Z",
-	  "user": "...user object..."
+	  "user": "...user object...",
+	  "annotations": []
 	}
 	"""
-	defstruct complete: false, created_at: "", derived_files: nil, file_token: "", id: "", image_info: nil, kind: "", mime_type: "", name: "", sha1: "", size: -1, source: nil, total_size: -1, type: "", url: "", url_expires: "", user: nil
+	defstruct complete: false, created_at: "", derived_files: nil, file_token: "", id: "", image_info: nil, kind: "", mime_type: "", name: "", sha1: "", size: -1, source: nil, total_size: -1, type: "", url: "", url_expires: "", user: nil, annotations: []
 end

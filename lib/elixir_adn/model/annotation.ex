@@ -8,5 +8,5 @@ defmodule ElixirADN.Model.Annotation do
     }
   }
 	"""
-	defstruct type: "", value: nil
+	defstruct type: "", value: %{}
 end

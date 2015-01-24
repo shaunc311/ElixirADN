@@ -44,8 +44,9 @@ defmodule ElixirADN.Model.Channel do
 	  "you_can_edit": true,
 	  "you_subscribed": true,
 	  "you_muted": false,
+	  "annotations" : [],
 	  "marker": "...marker object..."
 	}
 	"""
-	defstruct counts: nil, has_unread: false, id: "", owner: nil, is_inactive: false, readers: nil, editors: nil, recent_message_id: "", recent_message: nil, type: "", writers: nil, you_can_edit: false,  you_subscribed: false, you_muted: false, marker: nil 
+	defstruct counts: nil, has_unread: false, id: "", owner: nil, is_inactive: false, readers: nil, editors: nil, recent_message_id: "", recent_message: nil, type: "", writers: nil, you_can_edit: false,  you_subscribed: false, you_muted: false, annotations: [], marker: nil 
 end

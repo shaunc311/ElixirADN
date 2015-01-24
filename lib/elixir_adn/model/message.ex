@@ -1,5 +1,6 @@
 defmodule ElixirADN.Model.Message do
 	@doc ~S"""
+	An elixir representation of the ADN message map
 	{
 	  "channel_id": "1",
 	  "created_at": "2012-12-11T00:31:49Z",

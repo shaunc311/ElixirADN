@@ -6,17 +6,35 @@ defmodule ElixirADN.Parser.BaseParser do
 	data is ever needed it can be pulled from this map as well.
 	"""
 	def parse(:posts, body) when is_binary(body) do
-		posts_map = body
-			|> Poison.decode!
-			|> Map.get("data")
+		parse_data(body)
+	end
 
-		#posts = decode(:posts, posts_map, ElixirADN.Model.Post)
-			
-		{:ok, posts_map}
+	def parse(:users, body) when is_binary(body) do
+		parse_data(body)
+	end
+
+	def parse(:channels, body) when is_binary(body) do
+		parse_data(body)
+	end
+
+	def parse(:messages, body) when is_binary(body) do
+		parse_data(body)
+	end
+
+	def parse(:files, body) when is_binary(body) do
+		parse_data(body)
 	end
 
 	def parse(_,_) do
 		{:error, :invalid_data_to_parse}
+	end
+
+	defp parse_data(body) do
+		map = body
+			|> Poison.decode!
+			|> Map.get("data")
+
+		{:ok, map}
 	end
 
 	@doc ~S"""
@@ -75,6 +93,47 @@ defmodule ElixirADN.Parser.BaseParser do
 	defp decode_children(%ElixirADN.Model.Description{} = description) do
 		description
 			|> Map.put( :entities, decode(:entities, description.entities, ElixirADN.Model.Entities))
+	end
+
+	#Decode all the children properties from the channel object
+	defp decode_children(%ElixirADN.Model.Channel{} = channel) do
+		channel
+			|> Map.put( :counts, decode(:counts, channel.counts, ElixirADN.Model.ChannelCounts))
+			|> Map.put( :readers, decode(:readers, channel.readers, ElixirADN.Model.ChannelPermissions))
+			|> Map.put( :editors, decode(:editors, channel.editors, ElixirADN.Model.ChannelPermissions))
+			|> Map.put( :writers, decode(:writers, channel.writers, ElixirADN.Model.ChannelPermissions))
+			|> Map.put( :recent_message, decode(:recent_message, channel.recent_message, ElixirADN.Model.Message))
+			|> Map.put( :annotations, decode(:annotation, channel.annotations, ElixirADN.Model.Annotation))
+	end
+
+	#Decode all the children properties from the message object
+	defp decode_children(%ElixirADN.Model.Message{} = message) do
+		message
+			|> Map.put( :entities, decode(:entities, message.entities, ElixirADN.Model.Entities))
+			|> Map.put( :source, decode(:source, message.source, ElixirADN.Model.Source))
+			|> Map.put( :user, decode(:user, message.user, ElixirADN.Model.User))
+			|> Map.put( :annotations, decode(:annotation, message.annotations, ElixirADN.Model.Annotation))
+	end
+
+	#Decode all the children properties from the file object
+	defp decode_children(%ElixirADN.Model.File{} = file) do
+		file
+			|> Map.put( :derived_files, decode(:derived_files, file.derived_files, ElixirADN.Model.DerivedFiles))
+			|> Map.put( :image_info, decode(:image_info, file.image_info, ElixirADN.Model.ImageInfo))
+			|> Map.put( :source, decode(:source, file.source, ElixirADN.Model.Source))
+			|> Map.put( :user, decode(:user, file.user, ElixirADN.Model.User))
+	end
+
+	#Decode all the children properties from the derived file object
+	defp decode_children(%ElixirADN.Model.DerivedFiles{} = files) do
+		files
+			|> Map.put( :image_thumb_200s, decode(:image_thumb, files.image_thumb_200s, ElixirADN.Model.ImageThumb))
+			|> Map.put( :image_thumb_960r, decode(:image_thumb, files.image_thumb_960r, ElixirADN.Model.ImageThumb))
+	end
+
+	defp decode_children(%ElixirADN.Model.ImageThumb{} = thumb) do
+		thumb
+			|> Map.put( :image_info, decode(:image_info, thumb.image_info, ElixirADN.Model.ImageInfo))
 	end
 
 	#Decode all the children properties from the description object

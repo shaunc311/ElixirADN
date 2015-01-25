@@ -1,0 +1,172 @@
+{
+  "data": [
+    {
+      "counts": {
+        "messages": 42,
+        "subscribers": 43
+      },
+      "has_unread": false,
+      "id": "2",
+      "is_inactive": false,
+      "readers": {
+        "any_user": false,
+        "immutable": false,
+        "public": true,
+        "user_ids": [
+
+        ],
+        "you": true
+      },
+      "editors": {
+        "any_user": false,
+        "immutable": false,
+        "public": false,
+        "user_ids": [
+
+        ],
+        "you": true
+      },
+      "recent_message_id": "231",
+      "recent_message": {
+        "channel_id": "1",
+        "created_at": "2012-12-11T00:31:49Z",
+        "entities": {
+          "hashtags": [
+
+          ],
+          "links": [
+
+          ],
+          "mentions": [
+
+          ]
+        },
+        "html": "<span itemscope=\"https://app.net/schemas/Post\">Hello channel!</span>",
+        "id": "1",
+        "machine_only": false,
+        "num_replies": 0,
+        "source": {
+          "client_id": "UxUWrSdVLyCaShN62xZR5tknGvAxK93P",
+          "link": "https://app.net",
+          "name": "Test app"
+        },
+        "text": "Hello channel!",
+        "thread_id": "1",
+        "user": {
+          "avatar_image": {
+            "height": 200,
+            "is_default": false,
+            "url": "https://d2rfichhc2fb9n.cloudfront.net/image/5/aoveeP73f33UcFhyhqzn7VhwgS17InMiOiJzMyIsImIiOiJhZG4tdXNlci1hc3NldHMiLCJrIjoiYXNzZXRzL3VzZXIvOTkvYTYvNDAvOTlhNjQwMDAwMDAwMDAwMC5wbmciLCJvIjoiIn0",
+            "width": 200
+          },
+          "canonical_url": "https://alpha.app.net/adnapi",
+          "counts": {
+            "followers": 1549,
+            "following": 12,
+            "posts": 115,
+            "stars": 4
+          },
+          "cover_image": {
+            "height": 260,
+            "is_default": true,
+            "url": "https://d2rfichhc2fb9n.cloudfront.net/image/5/kZ-JRmTbmd3WVPswTJ8Nwxzkf917InMiOiJzMyIsImIiOiJ0YXBwLWFzc2V0cyIsImsiOiJpL1UvaS9ZL1VpWW5xRFNvTUtyTEhLNXA0OHN2NkxmTmRVMC5qcGciLCJvIjoiIn0",
+            "width": 960
+          },
+          "created_at": "2012-08-10T22:40:12Z",
+          "description": {
+            "entities": {
+              "hashtags": [
+
+              ],
+              "links": [
+                {
+                  "len": 7,
+                  "pos": 31,
+                  "text": "App.net",
+                  "url": "http://App.net"
+                }
+              ],
+              "mentions": [
+
+              ]
+            },
+            "html": "<span itemscope=\"https://app.net/schemas/Post\">Updating you on changes to the <a href=\"http://App.net\">App.net</a> API</span>",
+            "text": "Updating you on changes to the App.net API"
+          },
+          "id": "1558",
+          "locale": "en_US",
+          "name": "ADN API",
+          "timezone": "America/Los_Angeles",
+          "type": "human",
+          "username": "adnapi",
+          "verified_domain": "developers.app.net",
+          "follows_you": false,
+          "you_blocked": false,
+          "you_follow": false,
+          "you_muted": false,
+          "you_can_subscribe": true,
+          "you_can_follow": true
+        }
+      },
+      "type": "com.example.channel",
+      "writers": {
+        "any_user": false,
+        "immutable": false,
+        "public": false,
+        "user_ids": [
+
+        ],
+        "you": true
+      },
+      "you_can_edit": true,
+      "you_subscribed": true,
+      "you_muted": false
+    },
+    {
+      "counts": {
+        "messages": 42,
+        "subscribers": 43
+      },
+      "has_unread": false,
+      "id": "1",
+      "owner": "...user object...",
+      "is_inactive": false,
+      "readers": {
+        "any_user": false,
+        "immutable": false,
+        "public": true,
+        "user_ids": [
+
+        ],
+        "you": true
+      },
+      "editors": {
+        "any_user": false,
+        "immutable": false,
+        "public": false,
+        "user_ids": [
+
+        ],
+        "you": true
+      },
+      "recent_message_id": "231",
+      "recent_message": "...message object...",
+      "type": "com.example.channel",
+      "writers": {
+        "any_user": false,
+        "immutable": false,
+        "public": false,
+        "user_ids": [
+
+        ],
+        "you": true
+      },
+      "you_can_edit": true,
+      "you_subscribed": true,
+      "you_muted": false
+    }
+  ],
+  "meta": {
+    "code": 200
+  }
+}

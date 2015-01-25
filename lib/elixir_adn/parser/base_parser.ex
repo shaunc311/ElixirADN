@@ -1,5 +1,4 @@
 defmodule ElixirADN.Parser.BaseParser do
-	@behaviour ElixirADN.Parser.Parser
 
 	@doc ~S"""
 	Parse post data coming back from ADN.  It's mapped data => values
@@ -40,38 +39,47 @@ defmodule ElixirADN.Parser.BaseParser do
 	# Decode the value and see if we need to decode any child elements
 	def decode(_, value, as) do
 		result = Poison.Decode.decode(value, as: as)
-		decode_children(result)
+		_result = decode_children(result)
 	end
 
 	#Decode all the children properties from the post object
 	defp decode_children(%ElixirADN.Model.Post{} = post) do
-		post = Map.put post, :entities, decode(:entities, post.entities, ElixirADN.Model.Entities)
-		post = Map.put post, :source, decode(:source, post.source, ElixirADN.Model.Source)
-		post = Map.put post, :user, decode(:user, post.user, ElixirADN.Model.User)
-		post = Map.put post, :annotations, decode(:annotation, post.annotations, ElixirADN.Model.Annotation)
-		post = Map.put post, :reposters, decode(:users, post.reposters, ElixirADN.Model.User)
-		_post = Map.put post, :starred_by, decode(:users, post.starred_by, ElixirADN.Model.User)
+		post
+			|> Map.put( :entities, decode(:entities, post.entities, ElixirADN.Model.Entities))
+			|> Map.put( :source, decode(:source, post.source, ElixirADN.Model.Source))
+			|> Map.put( :user, decode(:user, post.user, ElixirADN.Model.User))
+			|> Map.put( :annotations, decode(:annotation, post.annotations, ElixirADN.Model.Annotation))
+			|> Map.put( :reposters, decode(:users, post.reposters, ElixirADN.Model.User))
+			|> Map.put( :starred_by, decode(:users, post.starred_by, ElixirADN.Model.User))
 	end
 
 	#Decode all the children properties from the user object
 	defp decode_children(%ElixirADN.Model.User{} = user) do
-		user = Map.put user, :avatar_image, decode(:image, user.avatar_image, ElixirADN.Model.Image)
-		user = Map.put user, :counts,  decode(:user_counts,user.counts, ElixirADN.Model.UserCounts)
-		user = Map.put user, :cover_image, decode(:image, user.cover_image, ElixirADN.Model.Image)
-		user = Map.put user, :description, decode(:description, user.description, ElixirADN.Model.Description)
-		_user = Map.put user, :annotations, decode(:annotation, user.annotations, ElixirADN.Model.Annotation)
+		user
+			|> Map.put( :avatar_image, decode(:image, user.avatar_image, ElixirADN.Model.Image))
+			|> Map.put( :counts,  decode(:user_counts,user.counts, ElixirADN.Model.UserCounts))
+			|> Map.put( :cover_image, decode(:image, user.cover_image, ElixirADN.Model.Image))
+			|> Map.put( :description, decode(:description, user.description, ElixirADN.Model.Description))
+			|> Map.put( :annotations, decode(:annotation, user.annotations, ElixirADN.Model.Annotation))
 	end
 
 	#Decode all the children properties from the entities object
 	defp decode_children(%ElixirADN.Model.Entities{} = entities) do
-		entities = Map.put entities, :hashtags, decode(:hashtags, entities.hashtags, ElixirADN.Model.Hashtag)
-		entities = Map.put entities, :links,  decode(:links,entities.links, ElixirADN.Model.Link)
-		_entities = Map.put entities, :mentions, decode(:mentions, entities.mentions, ElixirADN.Model.Mention)
+		entities
+			|> Map.put( :hashtags, decode(:hashtags, entities.hashtags, ElixirADN.Model.Hashtag))
+			|> Map.put( :links,  decode(:links,entities.links, ElixirADN.Model.Link))
+			|> Map.put( :mentions, decode(:mentions, entities.mentions, ElixirADN.Model.Mention))
 	end
 
 	#Decode all the children properties from the description object
 	defp decode_children(%ElixirADN.Model.Description{} = description) do
-		_description = Map.put description, :entities, decode(:entities, description.entities, ElixirADN.Model.Entities)
+		description
+			|> Map.put( :entities, decode(:entities, description.entities, ElixirADN.Model.Entities))
+	end
+
+	#Decode all the children properties from the description object
+	defp decode_children(list) when is_list(list) do
+		Enum.map( list, fn(x) -> decode_children(x) end)
 	end
 
 	#Fallthrough for decoding children that just returns the parent object

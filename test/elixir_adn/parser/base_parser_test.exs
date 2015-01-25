@@ -490,4 +490,10 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert message == :invalid_data_to_parse
   end
 
+  test "parse invalid type" do
+    {result, message} = ElixirADN.Parser.BaseParser.parse(:uhoh, "ohno")
+    assert result == :error
+    assert message == :invalid_atom_to_parse
+  end
+
 end

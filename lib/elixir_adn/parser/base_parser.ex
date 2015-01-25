@@ -5,24 +5,12 @@ defmodule ElixirADN.Parser.BaseParser do
 	so it needs to get the data value after parsing.  If the meta 
 	data is ever needed it can be pulled from this map as well.
 	"""
-	def parse(:posts, body) when is_binary(body) do
+	def parse(atom, body) when is_binary(body) and atom in [:posts, :users, :channels, :messages, :files]  do
 		parse_data(body)
 	end
 
-	def parse(:users, body) when is_binary(body) do
-		parse_data(body)
-	end
-
-	def parse(:channels, body) when is_binary(body) do
-		parse_data(body)
-	end
-
-	def parse(:messages, body) when is_binary(body) do
-		parse_data(body)
-	end
-
-	def parse(:files, body) when is_binary(body) do
-		parse_data(body)
+	def parse(atom, body) when is_binary(body) and is_atom(atom) do
+		{:error, :invalid_atom_to_parse}
 	end
 
 	def parse(_,_) do

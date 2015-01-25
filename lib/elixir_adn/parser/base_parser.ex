@@ -11,9 +11,9 @@ defmodule ElixirADN.Parser.BaseParser do
 			|> Poison.decode!
 			|> Map.get("data")
 
-		posts = decode(:posts, posts_map, ElixirADN.Model.Post)
+		#posts = decode(:posts, posts_map, ElixirADN.Model.Post)
 			
-		{:ok, posts}
+		{:ok, posts_map}
 	end
 
 	def parse(_,_) do

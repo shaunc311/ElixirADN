@@ -65,5 +65,5 @@ defmodule ElixirADN.Model.User do
 	  ]
 	}
 	"""
-	defstruct avatar_image: nil, canonical_url: "", counts: nil, cover_image: nil, created_at: nil, description: nil, id: "", locale: "", name: "", timezone: "", type: "", username: "", verified_domain: "", follow_you: false, you_blocked: false, you_follow: false, you_muted: false, you_can_subscribe: false, you_can_follow: false, annotations: []
+	defstruct avatar_image: nil, canonical_url: "", counts: nil, cover_image: nil, created_at: nil, description: nil, id: "", locale: "", name: "", timezone: "", type: "", username: "", verified_domain: "", follows_you: false, you_blocked: false, you_follow: false, you_muted: false, you_can_subscribe: false, you_can_follow: false, annotations: []
 end

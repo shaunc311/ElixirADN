@@ -25,6 +25,8 @@ defmodule ElixirADN.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    [
+      {:poison, "~> 1.3.0"}
+    ]
   end
 end

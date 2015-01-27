@@ -1,9 +1,17 @@
 defmodule ElixirADN.Parser.BaseParserTest do
   use ExUnit.Case, async: false
 
-  test "parse posts response" do
-    doc = File.read!("./test/elixir_adn/parser/posts.json")
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, doc)
+  setup_all do
+    posts = File.read!("./test/elixir_adn/parser/posts.json")
+    users = File.read!("./test/elixir_adn/parser/users.json")
+    channels = File.read!("./test/elixir_adn/parser/channels.json")
+    messages = File.read!("./test/elixir_adn/parser/messages.json")
+    files = File.read!("./test/elixir_adn/parser/files.json")
+    {:ok, posts: posts, users: users, channels: channels, messages: messages, files: files}
+  end
+
+  test "parse posts response", %{posts: posts} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, posts)
     assert result == :ok
     
     [%ElixirADN.Model.Post{} = post] = ElixirADN.Parser.BaseParser.decode(:posts, map, ElixirADN.Model.Post)
@@ -23,9 +31,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
 
   end
 
-  test "parse post entities" do
-    doc = File.read!("./test/elixir_adn/parser/posts.json")
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, doc)
+  test "parse post entities", %{posts: posts} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, posts)
     assert result == :ok
     
     [%ElixirADN.Model.Post{} = post] = ElixirADN.Parser.BaseParser.decode(:posts, map, ElixirADN.Model.Post)
@@ -41,10 +48,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert mentions == []
   end
   
-  test "parse post source" do
-    doc = File.read!("./test/elixir_adn/parser/posts.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, doc)
+  test "parse post source", %{posts: posts} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, posts)
     assert result == :ok
     
     [%ElixirADN.Model.Post{} = post] = ElixirADN.Parser.BaseParser.decode(:posts, map, ElixirADN.Model.Post)
@@ -55,10 +60,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert name == "Alpha"
   end
 
-  test "parse post user" do
-    doc = File.read!("./test/elixir_adn/parser/posts.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, doc)
+  test "parse post user", %{posts: posts} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, posts)
     assert result == :ok
     
     [%ElixirADN.Model.Post{} = post] = ElixirADN.Parser.BaseParser.decode(:posts, map, ElixirADN.Model.Post)
@@ -115,10 +118,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert annotation_value ==  %{"url" => "http://daltoncaldwell.com/"}
   end
 
-  test "parse post annotations" do
-    doc = File.read!("./test/elixir_adn/parser/posts.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, doc)
+  test "parse post annotations", %{posts: posts} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, posts)
     assert result == :ok
     
     [%ElixirADN.Model.Post{} = post] = ElixirADN.Parser.BaseParser.decode(:posts, map, ElixirADN.Model.Post)
@@ -130,10 +131,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert length(post.reposters) == 2
 
   end
-  test "parse post reposters" do
-    doc = File.read!("./test/elixir_adn/parser/posts.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, doc)
+  test "parse post reposters", %{posts: posts} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, posts)
     assert result == :ok
     
     [%ElixirADN.Model.Post{} = post] = ElixirADN.Parser.BaseParser.decode(:posts, map, ElixirADN.Model.Post)
@@ -143,10 +142,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert reposter_id_2 == "8"
   end
 
-  test "parse post starred_by" do
-    doc = File.read!("./test/elixir_adn/parser/posts.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, doc)
+  test "parse post starred_by", %{posts: posts} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:posts, posts)
     assert result == :ok
     
     [%ElixirADN.Model.Post{} = post] = ElixirADN.Parser.BaseParser.decode(:posts, map, ElixirADN.Model.Post)
@@ -155,10 +152,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert star_id == "9"
   end
 
-   test "parse user response" do
-    doc = File.read!("./test/elixir_adn/parser/users.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, doc)
+   test "parse user response", %{users: users} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, users)
     assert result == :ok
     
     [%ElixirADN.Model.User{} = user1, _user2] = ElixirADN.Parser.BaseParser.decode(:users, map, ElixirADN.Model.User)
@@ -182,10 +177,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert user1.annotations == nil
   end
 
-  test "parse user avatar image" do
-    doc = File.read!("./test/elixir_adn/parser/users.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, doc)
+  test "parse user avatar image", %{users: users} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, users)
     assert result == :ok
     
     [%ElixirADN.Model.User{} = user1, _user2] = ElixirADN.Parser.BaseParser.decode(:users, map, ElixirADN.Model.User)
@@ -197,10 +190,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert stars == 4
   end
 
-  test "parse user counts" do
-    doc = File.read!("./test/elixir_adn/parser/users.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, doc)
+  test "parse user counts", %{users: users} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, users)
     assert result == :ok
     
     [%ElixirADN.Model.User{} = user1, _user2] = ElixirADN.Parser.BaseParser.decode(:users, map, ElixirADN.Model.User)
@@ -213,10 +204,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
   end
 
 
-  test "parse user cover image" do
-    doc = File.read!("./test/elixir_adn/parser/users.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, doc)
+  test "parse user cover image", %{users: users} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, users)
     assert result == :ok
     
     [%ElixirADN.Model.User{} = user1, _user2] = ElixirADN.Parser.BaseParser.decode(:users, map, ElixirADN.Model.User)
@@ -228,10 +217,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert cover_image_width == 960
   end
 
-  test "parse user description" do
-    doc = File.read!("./test/elixir_adn/parser/users.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, doc)
+  test "parse user description", %{users: users} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:users, users)
     assert result == :ok
     
     [%ElixirADN.Model.User{} = user1, _user2] = ElixirADN.Parser.BaseParser.decode(:users, map, ElixirADN.Model.User)
@@ -247,10 +234,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert text == "Updating you on changes to the App.net API"
   end
 
-  test "parse channel response" do
-    doc = File.read!("./test/elixir_adn/parser/channels.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, doc)
+  test "parse channel response", %{channels: channels} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, channels)
     assert result == :ok
     
     [%ElixirADN.Model.Channel{} = channel1, _channel2] = ElixirADN.Parser.BaseParser.decode(:chanels, map, ElixirADN.Model.Channel)
@@ -264,10 +249,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert channel1.you_muted == false
   end
 
-  test "parse channel counts" do
-    doc = File.read!("./test/elixir_adn/parser/channels.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, doc)
+  test "parse channel counts", %{channels: channels} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, channels)
     assert result == :ok
     
     [%ElixirADN.Model.Channel{} = channel1, _channel2] = ElixirADN.Parser.BaseParser.decode(:chanels, map, ElixirADN.Model.Channel)
@@ -278,10 +261,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert subscribers == 43
   end
 
-  test "parse channel readers" do
-    doc = File.read!("./test/elixir_adn/parser/channels.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, doc)
+  test "parse channel readers", %{channels: channels} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, channels)
     assert result == :ok
     
     [%ElixirADN.Model.Channel{} = channel1, _channel2] = ElixirADN.Parser.BaseParser.decode(:chanels, map, ElixirADN.Model.Channel)
@@ -295,10 +276,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert you == true
   end
 
-  test "parse channel editors" do
-    doc = File.read!("./test/elixir_adn/parser/channels.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, doc)
+  test "parse channel editors", %{channels: channels} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, channels)
     assert result == :ok
     
     [%ElixirADN.Model.Channel{} = channel1, _channel2] = ElixirADN.Parser.BaseParser.decode(:chanels, map, ElixirADN.Model.Channel)
@@ -312,10 +291,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert you == true
   end
 
-  test "parse channel writers" do
-    doc = File.read!("./test/elixir_adn/parser/channels.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, doc)
+  test "parse channel writers", %{channels: channels} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, channels)
     assert result == :ok
     
     [%ElixirADN.Model.Channel{} = channel1, _channel2] = ElixirADN.Parser.BaseParser.decode(:chanels, map, ElixirADN.Model.Channel)
@@ -330,10 +307,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
   end
 
 
-  test "parse channel recent message" do
-    doc = File.read!("./test/elixir_adn/parser/channels.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, doc)
+  test "parse channel recent message", %{channels: channels} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, channels)
     assert result == :ok
     
     [%ElixirADN.Model.Channel{} = channel1, _channel2] = ElixirADN.Parser.BaseParser.decode(:chanels, map, ElixirADN.Model.Channel)
@@ -350,10 +325,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert message.thread_id == "1"
   end
 
-  test "parse channel recent message entities" do
-    doc = File.read!("./test/elixir_adn/parser/channels.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, doc)
+  test "parse channel recent message entities", %{channels: channels} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, channels)
     assert result == :ok
     
     [%ElixirADN.Model.Channel{} = channel1, _channel2] = ElixirADN.Parser.BaseParser.decode(:chanels, map, ElixirADN.Model.Channel)
@@ -365,10 +338,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert mentions == []    
   end
 
-  test "parse channel recent message source" do
-    doc = File.read!("./test/elixir_adn/parser/channels.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, doc)
+  test "parse channel recent message source", %{channels: channels} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, channels)
     assert result == :ok
     
     [%ElixirADN.Model.Channel{} = channel1, _channel2] = ElixirADN.Parser.BaseParser.decode(:chanels, map, ElixirADN.Model.Channel)
@@ -380,10 +351,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert name == "Test app"
   end
 
-  test "parse channel recent message user" do
-    doc = File.read!("./test/elixir_adn/parser/channels.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, doc)
+  test "parse channel recent message user", %{channels: channels} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:channels, channels)
     assert result == :ok
     
     [%ElixirADN.Model.Channel{} = channel1, _channel2] = ElixirADN.Parser.BaseParser.decode(:chanels, map, ElixirADN.Model.Channel)
@@ -392,10 +361,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert message.user.id == "1558"
   end
 
-  test "parse message response" do
-    doc = File.read!("./test/elixir_adn/parser/messages.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:messages, doc)
+  test "parse message response", %{messages: messages} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:messages, messages)
     assert result == :ok
     
     [%ElixirADN.Model.Message{} = message] = ElixirADN.Parser.BaseParser.decode(:messages, map, ElixirADN.Model.Message)
@@ -409,10 +376,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert message.thread_id == "1"
   end
 
-  test "parse files response" do
-    doc = File.read!("./test/elixir_adn/parser/files.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:files, doc)
+  test "parse files response", %{files: files} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:files, files)
     assert result == :ok
     
     file = ElixirADN.Parser.BaseParser.decode(:files, map, ElixirADN.Model.File)
@@ -431,10 +396,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert file.url_expires == "2013-01-25T03:00:00Z"
   end
 
-  test "parse files derived files" do
-    doc = File.read!("./test/elixir_adn/parser/files.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:files, doc)
+  test "parse files derived files", %{files: files} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:files, files)
     assert result == :ok
     
     file = ElixirADN.Parser.BaseParser.decode(:files, map, ElixirADN.Model.File)
@@ -457,10 +420,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert regular.image_info.height == 800
   end
 
-  test "parse files image info" do
-    doc = File.read!("./test/elixir_adn/parser/files.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:files, doc)
+  test "parse files image info", %{files: files} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:files, files)
     assert result == :ok
     
     file = ElixirADN.Parser.BaseParser.decode(:files, map, ElixirADN.Model.File)
@@ -470,10 +431,8 @@ defmodule ElixirADN.Parser.BaseParserTest do
     assert height == 800
   end
 
-  test "parse files source" do
-    doc = File.read!("./test/elixir_adn/parser/files.json")
-    
-    {result, map} = ElixirADN.Parser.BaseParser.parse(:files, doc)
+  test "parse files source", %{files: files} do
+    {result, map} = ElixirADN.Parser.BaseParser.parse(:files, files)
     assert result == :ok
     
     file = ElixirADN.Parser.BaseParser.decode(:files, map, ElixirADN.Model.File)

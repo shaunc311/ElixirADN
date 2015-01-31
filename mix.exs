@@ -26,6 +26,7 @@ defmodule ElixirADN.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
+      {:block_timer, "~> 0.0.1"},
       {:mock, "~> 0.1.0"},
       {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.0"},
       {:httpotion, "~> 1.0.0"},

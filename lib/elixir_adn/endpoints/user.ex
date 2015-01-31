@@ -41,6 +41,7 @@ defmodule ElixirADN.Endpoints.User do
 		{:error, :invalid_parameter_to_parse}
 	end
 
+	#Parse the response body into a map and then into objects
 	defp parse_to_posts(%HTTPotion.Response{body: body}) do
 		{result, value} = BaseParser.parse(:users, body)
 		case result do
@@ -49,6 +50,7 @@ defmodule ElixirADN.Endpoints.User do
 		end
 	end
 
+	#Turn the parameters into a query string and then make the get call
 	defp process_get_posts(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination ) do
 		query_string_result = Encoder.generate_query_string([post_parameters, pagination])
 
@@ -58,6 +60,8 @@ defmodule ElixirADN.Endpoints.User do
 		end	
 	end
 
+	#A general function to call an http method.  This should be in it's own
+	#module eventually
 	defp call({:get, url}) do
 		return_on_success = HTTPotion.get(url)
 		%HTTPotion.Response{ status_code: code } = return_on_success

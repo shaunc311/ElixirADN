@@ -1,10 +1,14 @@
 defmodule ElixirADN.Endpoints.User do
+	alias ElixirADN.Endpoints.Parameters.Encoder
+	alias ElixirADN.Endpoints.Parameters.Pagination
+	alias ElixirADN.Endpoints.Parameters.PostParameters
+	
 	@doc ~S"""
 	Returns the rest method and endpoint for a user's posts.  This also 
 	takes into account any post or pagination parameters.
 		
 		## Examples
-
+		
 			iex> ElixirADN.Endpoints.User.get_posts("@user", %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{} )
 			{:get, "https://api.app.net/users/@user/posts" }
 
@@ -37,7 +41,7 @@ defmodule ElixirADN.Endpoints.User do
 
 
 	"""
-	def get_posts(user_id, %ElixirADN.Endpoints.Parameters.PostParameters{} = post_parameters, %ElixirADN.Endpoints.Parameters.Pagination{} = pagination) when is_binary(user_id) do
+	def get_posts(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination) when is_binary(user_id) do
 		case String.at(user_id, 0) do
 			nil -> {:error, :no_account_name}
 			"@" -> process_get_posts(user_id, post_parameters, pagination)
@@ -45,7 +49,7 @@ defmodule ElixirADN.Endpoints.User do
 		end
 	end
 
-	def get_posts(user_id, %ElixirADN.Endpoints.Parameters.PostParameters{} = post_parameters, %ElixirADN.Endpoints.Parameters.Pagination{} = pagination) when is_integer(user_id) do
+	def get_posts(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination) when is_integer(user_id) do
 		process_get_posts(user_id, post_parameters, pagination)
 	end
 
@@ -54,8 +58,8 @@ defmodule ElixirADN.Endpoints.User do
 	end
 
 
-	defp process_get_posts(user_id, %ElixirADN.Endpoints.Parameters.PostParameters{} = post_parameters, %ElixirADN.Endpoints.Parameters.Pagination{} = pagination ) do
-		query_string_result = ElixirADN.Endpoints.Parameters.Encoder.generate_query_string(post_parameters, pagination)
+	defp process_get_posts(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination ) do
+		query_string_result = Encoder.generate_query_string(post_parameters, pagination)
 
 		case query_string_result do
 			{:ok, query_string} -> {:get, "https://api.app.net/users/#{user_id}/posts#{query_string}"}

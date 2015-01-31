@@ -1,4 +1,4 @@
-defmodule ElixirADN.Parser.BaseParser do
+defmodule ElixirADN.Parser.ResultParser do
 	alias ElixirADN.Model.Annotation
 	alias ElixirADN.Model.Channel
 	alias ElixirADN.Model.ChannelCounts

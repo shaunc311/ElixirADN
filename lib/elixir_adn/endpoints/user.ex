@@ -3,7 +3,7 @@ defmodule ElixirADN.Endpoints.User do
 	alias ElixirADN.Endpoints.Parameters.Pagination
 	alias ElixirADN.Endpoints.Parameters.PostParameters
 	alias ElixirADN.Model.Post
-	alias ElixirADN.Parser.BaseParser
+	alias ElixirADN.Parser.ResultParser
 	alias ElixirADN.Parser.StatusParser
 
 	@moduledoc ~S"""
@@ -43,9 +43,9 @@ defmodule ElixirADN.Endpoints.User do
 
 	#Parse the response body into a map and then into objects
 	defp parse_to_posts(%HTTPotion.Response{body: body}) do
-		{result, value} = BaseParser.parse(:users, body)
+		{result, value} = ResultParser.parse(:users, body)
 		case result do
-			:ok -> BaseParser.decode(:posts, value, Post)
+			:ok -> ResultParser.decode(:posts, value, Post)
 			:error -> {:error, value}
 		end
 	end

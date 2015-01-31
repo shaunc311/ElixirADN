@@ -58,6 +58,78 @@ defmodule ElixirADN.Endpoints.UserTest do
   	assert Enum.count(posts) == 1
   end
 
+  test_with_mock "no content", %{doc: doc}, HTTPotion, [:passthrough],
+    [get: fn(_url) -> %HTTPotion.Response{ status_code: 204} end] do
+
+    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert code == :error
+		assert message == :no_content
+  end
+
+  test_with_mock "bad request", %{doc: doc}, HTTPotion, [:passthrough],
+    [get: fn(_url) -> %HTTPotion.Response{ status_code: 400} end] do
+
+    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert code == :error
+		assert message == :bad_request
+  end
+
+  test_with_mock "unauthorized", %{doc: doc}, HTTPotion, [:passthrough],
+    [get: fn(_url) -> %HTTPotion.Response{ status_code: 401} end] do
+
+    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert code == :error
+		assert message == :unauthorized
+  end
+
+  test_with_mock "forbidden", %{doc: doc}, HTTPotion, [:passthrough],
+    [get: fn(_url) -> %HTTPotion.Response{ status_code: 403} end] do
+
+    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert code == :error
+		assert message == :forbidden
+  end
+
+  test_with_mock "not found", %{doc: doc}, HTTPotion, [:passthrough],
+    [get: fn(_url) -> %HTTPotion.Response{ status_code: 404} end] do
+
+    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert code == :error
+		assert message == :not_found
+  end
+
+  test_with_mock "method not allowed", %{doc: doc}, HTTPotion, [:passthrough],
+    [get: fn(_url) -> %HTTPotion.Response{ status_code: 405} end] do
+
+    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert code == :error
+		assert message == :method_not_allowed
+  end
+
+  test_with_mock "too many requests", %{doc: doc}, HTTPotion, [:passthrough],
+    [get: fn(_url) -> %HTTPotion.Response{ status_code: 429} end] do
+
+    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert code == :error
+		assert message == :too_many_requests
+  end
+
+  test_with_mock "internal server error", %{doc: doc}, HTTPotion, [:passthrough],
+    [get: fn(_url) -> %HTTPotion.Response{ status_code: 500} end] do
+
+    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert code == :error
+		assert message == :internal_server_error
+  end
+
+  test_with_mock "insufficient storage", %{doc: doc}, HTTPotion, [:passthrough],
+    [get: fn(_url) -> %HTTPotion.Response{ status_code: 507} end] do
+
+    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert code == :error
+		assert message == :insufficient_storage
+  end
+
   test "invalid parameter objects" do
   	{code, message } = User.get_posts("@user", %{ include_muted: true, include_annotations: false }, %{count: 5, before_id: 2} )
 		assert code == :error
@@ -81,4 +153,5 @@ defmodule ElixirADN.Endpoints.UserTest do
 		assert code == :error
 		assert message == {:value_out_of_range, :count, -201}
 	end
+
 end

@@ -16,7 +16,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts for account", %{doc: doc}, HTTPotion, [:passthrough],
     [get: fn(_url) -> doc end] do
 
-    posts = User.get_posts("@shauncollins", %PostParameters{}, %Pagination{})
+    {:ok, posts }= User.get_posts("@shauncollins", %PostParameters{}, %Pagination{})
   	
   	assert called HTTPotion.get("https://api.app.net/users/@shauncollins/posts")
   	assert Enum.count(posts) == 1
@@ -25,7 +25,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts for account with muted", %{doc: doc}, HTTPotion, [:passthrough],
     [get: fn(_url) -> doc end] do
 
-    posts = User.get_posts("@shauncollins", %PostParameters{include_muted: true}, %Pagination{})
+    {:ok, posts } = User.get_posts("@shauncollins", %PostParameters{include_muted: true}, %Pagination{})
   	
   	assert called HTTPotion.get("https://api.app.net/users/@shauncollins/posts?include_muted=1")
   	assert Enum.count(posts) == 1
@@ -34,7 +34,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts with count", %{doc: doc}, HTTPotion, [:passthrough],
     [get: fn(_url) -> doc end] do
 
-    posts = User.get_posts("@shauncollins", %PostParameters{}, %Pagination{count: 5})
+    {:ok, posts } = User.get_posts("@shauncollins", %PostParameters{}, %Pagination{count: 5})
   	
   	assert called HTTPotion.get("https://api.app.net/users/@shauncollins/posts?count=5")
   	assert Enum.count(posts) == 1
@@ -43,7 +43,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts with count and muted", %{doc: doc}, HTTPotion, [:passthrough],
     [get: fn(_url) -> doc end] do
 
-    posts = User.get_posts("@shauncollins", %PostParameters{include_muted: true}, %Pagination{count: 5})
+    {:ok, posts } = User.get_posts("@shauncollins", %PostParameters{include_muted: true}, %Pagination{count: 5})
   	
   	assert called HTTPotion.get("https://api.app.net/users/@shauncollins/posts?include_muted=1&count=5")
   	assert Enum.count(posts) == 1
@@ -52,7 +52,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts by id number", %{doc: doc}, HTTPotion, [:passthrough],
     [get: fn(_url) -> doc end] do
 
-    posts = User.get_posts(410, %PostParameters{}, %Pagination{})
+    {:ok, posts } = User.get_posts(410, %PostParameters{}, %Pagination{})
   	
   	assert called HTTPotion.get("https://api.app.net/users/410/posts")
   	assert Enum.count(posts) == 1

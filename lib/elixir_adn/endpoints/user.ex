@@ -25,7 +25,7 @@ defmodule ElixirADN.Endpoints.User do
 		end
 		case result do
 			{:error, _} -> result
-			_ -> parse_to_posts(result)
+			_ -> {:ok, parse_to_posts(result)}
 		end
 	end
 
@@ -33,7 +33,7 @@ defmodule ElixirADN.Endpoints.User do
 		result = process_get_posts(user_id, post_parameters, pagination)
 		case result do
 			{:error, _} -> result
-			_ -> parse_to_posts(result)
+			_ -> {:ok, parse_to_posts(result)}
 		end
 	end
 

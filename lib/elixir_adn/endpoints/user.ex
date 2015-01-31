@@ -2,7 +2,12 @@ defmodule ElixirADN.Endpoints.User do
 	alias ElixirADN.Endpoints.Parameters.Encoder
 	alias ElixirADN.Endpoints.Parameters.Pagination
 	alias ElixirADN.Endpoints.Parameters.PostParameters
+	@moduledoc ~S"""
+	An interface to the user endpoints in ADN.  They are urls begining with 
+	/users here:
 	
+	https://developers.app.net/reference/resources/
+	"""	
 	@doc ~S"""
 	Returns the rest method and endpoint for a user's posts.  This also 
 	takes into account any post or pagination parameters.

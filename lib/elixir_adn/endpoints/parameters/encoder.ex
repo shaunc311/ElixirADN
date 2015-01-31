@@ -1,4 +1,7 @@
 defmodule ElixirADN.Endpoints.Parameters.Encoder do
+	alias ElixirADN.Endpoints.Parameters.Pagination
+	alias ElixirADN.Endpoints.Parameters.PostParameters
+
 	@doc ~S"""
 	Turn a pagination object into a collection of tuples of query parameters.
 
@@ -53,7 +56,7 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 			{:error, :invalid_object_to_parse }
 
 	"""
-	def generate_query_string(%ElixirADN.Endpoints.Parameters.PostParameters{} = post_parameters, %ElixirADN.Endpoints.Parameters.Pagination{} =pagination) do
+	def generate_query_string(%PostParameters{} = post_parameters, %Pagination{} =pagination) do
 		post_result = encode_parameters(post_parameters)
 		pagination_result = encode_parameters(pagination)
 		
@@ -111,15 +114,15 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 	end
 
 	#Pagination errors when the count is less than -200 or greater than 200
-	defp validate(%ElixirADN.Endpoints.Parameters.Pagination{count: count}) when abs(count) > 200 do
+	defp validate(%Pagination{count: count}) when abs(count) > 200 do
 		{:error, {:value_out_of_range, :count, count}}
 	end
 
 	#Pagination with a count inside -200 to 200 which is totally ok, although 0 might be stupid
-	defp validate(%ElixirADN.Endpoints.Parameters.Pagination{}), do: :ok
+	defp validate(%Pagination{}), do: :ok
 
 	#All the parameters in PostParameters are flags so make sure everything is true/false
-	defp validate(%ElixirADN.Endpoints.Parameters.PostParameters{} = post_parameters) do
+	defp validate(%PostParameters{} = post_parameters) do
 		result = Map.keys(post_parameters)
 			|> Enum.reduce( :ok, fn(key,acc) -> validate_boolean_parameter(acc, key, Map.get(post_parameters, key)) end)
 		result

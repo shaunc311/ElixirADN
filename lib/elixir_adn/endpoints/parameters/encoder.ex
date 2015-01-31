@@ -1,9 +1,16 @@
 defmodule ElixirADN.Endpoints.Parameters.Encoder do
 	alias ElixirADN.Endpoints.Parameters.Pagination
 	alias ElixirADN.Endpoints.Parameters.PostParameters
+	@moduledoc ~S"""
+	This module encodes a list of parameter objects into a query string.  It currently 
+	works with Pagination and Post Parameters.
 
+	Pagination: https://developers.app.net/reference/make-request/pagination
+	Post: https://developers.app.net/reference/resources/post/#general-parameters
+
+	"""
 	@doc ~S"""
-	Turn a pagination object into a collection of tuples of query parameters.
+	Turn a pagination object into a collection of objects into a query string.
 
 	It will return one of:
 		{:ok, query_string} where query_string is a basic formatted query string.  There are probably defects in here.
@@ -13,56 +20,53 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 
 	## Examples
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{}
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{}]
 			{:ok, "" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{since_id: 400}
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{since_id: 400}]
 			{:ok, "?since_id=400" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{before_id: 400}
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{before_id: 400}]
 			{:ok, "?before_id=400" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{count: -100 }
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{count: -100 }]
 			{:ok, "?count=-100" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{count: 200 }
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{count: 200 }]
 			{:ok, "?count=200" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{before_id: 1, count: 200 }
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{before_id: 1, count: 200 }]
 			{:ok, "?before_id=1&count=200" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{ include_muted: true}, %ElixirADN.Endpoints.Parameters.Pagination{before_id: 1, count: 200 }
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{ include_muted: true}, %ElixirADN.Endpoints.Parameters.Pagination{before_id: 1, count: 200 }]
 			{:ok, "?include_muted=1&before_id=1&count=200" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{count: 201 }
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{count: 201 }]
 			{:error, {:value_out_of_range, :count, 201 } }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{count: -201 }
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{count: -201 }]
 			{:error, {:value_out_of_range, :count, -201 } }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{}
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{}]
 			{:ok, "" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{include_annotations: false}, %ElixirADN.Endpoints.Parameters.Pagination{}
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{include_annotations: false}, %ElixirADN.Endpoints.Parameters.Pagination{}]
 			{:ok, "?include_annotations=0" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{include_muted: 1}, %ElixirADN.Endpoints.Parameters.Pagination{}
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{include_muted: 1}, %ElixirADN.Endpoints.Parameters.Pagination{}]
 			{:error, {:invalid_boolean_value, :include_muted, 1 }} 
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string %ElixirADN.Endpoints.Parameters.PostParameters{include_muted: true, include_deleted: true, include_directed_posts: true, include_machine: true, include_starred_by: true, include_reposters: true, include_annotations: true, include_post_annotations: true, include_user_annotations: true, include_html: true}, %ElixirADN.Endpoints.Parameters.Pagination{}
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{include_muted: true, include_deleted: true, include_directed_posts: true, include_machine: true, include_starred_by: true, include_reposters: true, include_annotations: true, include_post_annotations: true, include_user_annotations: true, include_html: true}, %ElixirADN.Endpoints.Parameters.Pagination{}]
 			{:ok, "?include_annotations=1&include_deleted=1&include_directed_posts=1&include_html=1&include_machine=1&include_muted=1&include_post_annotations=1&include_reposters=1&include_starred_by=1&include_user_annotations=1" }
 
-			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string "hi", "hello"
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string ["hi", "hello"]
 			{:error, :invalid_object_to_parse }
 
 	"""
-	def generate_query_string(%PostParameters{} = post_parameters, %Pagination{} =pagination) do
-		post_result = encode_parameters(post_parameters)
-		pagination_result = encode_parameters(pagination)
-		
-		#check for errors
-		results = Enum.reduce([post_result, pagination_result], [], fn(x,acc) -> gather_parameters(x, acc) end)
-		
+	def generate_query_string(parameters) when is_list(parameters) do
+		results = Enum.map(parameters, fn(x) -> convert_to_query_string(x) end)
+			|> Enum.reduce([], fn(x, acc) -> gather_parameters(x, acc) end)
+
 		#if it's a list then it isn't an error
 		case is_list(results) do
 			true -> 
@@ -74,9 +78,18 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 		end
 	end
 
+	#This is a passthrough to make sure we have a valid object to encode
+	defp convert_to_query_string(%PostParameters{} = post_parameters) do
+		encode_parameters(post_parameters)
+	end
+
+	defp convert_to_query_string(%Pagination{} = pagination) do
+		encode_parameters(pagination)
+	end
+
 	#This shouldn't hit because encoder is only called from an endpoint
 	#that should already check this
-	def generate_query_string(_,_), do: {:error, :invalid_object_to_parse}
+	defp convert_to_query_string(_), do: {:error, :invalid_object_to_parse}
 
 	#Turn the struct into a query string
 	defp encode_parameters(struct) do

@@ -59,7 +59,7 @@ defmodule ElixirADN.Endpoints.User do
 
 
 	defp process_get_posts(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination ) do
-		query_string_result = Encoder.generate_query_string(post_parameters, pagination)
+		query_string_result = Encoder.generate_query_string([post_parameters, pagination])
 
 		case query_string_result do
 			{:ok, query_string} -> {:get, "https://api.app.net/users/#{user_id}/posts#{query_string}"}

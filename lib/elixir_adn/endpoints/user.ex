@@ -2,73 +2,69 @@ defmodule ElixirADN.Endpoints.User do
 	alias ElixirADN.Endpoints.Parameters.Encoder
 	alias ElixirADN.Endpoints.Parameters.Pagination
 	alias ElixirADN.Endpoints.Parameters.PostParameters
+	alias ElixirADN.Model.Post
+	alias ElixirADN.Parser.BaseParser
+	alias ElixirADN.Parser.StatusParser
+
 	@moduledoc ~S"""
 	An interface to the user endpoints in ADN.  They are urls begining with 
 	/users here:
 	
-	https://developers.app.net/reference/resources/
+	https://developers.app.net/reference/resources/	
 	"""	
+
 	@doc ~S"""
-	Returns the rest method and endpoint for a user's posts.  This also 
-	takes into account any post or pagination parameters.
-		
-		## Examples
-		
-			iex> ElixirADN.Endpoints.User.get_posts("@user", %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{} )
-			{:get, "https://api.app.net/users/@user/posts" }
-
-			iex> ElixirADN.Endpoints.User.get_posts("@user", %ElixirADN.Endpoints.Parameters.PostParameters{ include_muted: true }, %ElixirADN.Endpoints.Parameters.Pagination{} )
-			{:get, "https://api.app.net/users/@user/posts?include_muted=1" }
-
-			iex> ElixirADN.Endpoints.User.get_posts("@user", %ElixirADN.Endpoints.Parameters.PostParameters{}, %ElixirADN.Endpoints.Parameters.Pagination{count: 5} )
-			{:get, "https://api.app.net/users/@user/posts?count=5" }
-
-			iex> ElixirADN.Endpoints.User.get_posts("@user", %ElixirADN.Endpoints.Parameters.PostParameters{ include_muted: true }, %ElixirADN.Endpoints.Parameters.Pagination{count: 5} )
-			{:get, "https://api.app.net/users/@user/posts?include_muted=1&count=5" }
-
-			iex> ElixirADN.Endpoints.User.get_posts("@user", %ElixirADN.Endpoints.Parameters.PostParameters{ include_muted: true, include_annotations: false }, %ElixirADN.Endpoints.Parameters.Pagination{count: 5, before_id: 2} )
-			{:get, "https://api.app.net/users/@user/posts?include_annotations=0&include_muted=1&before_id=2&count=5" }
-
-			iex> ElixirADN.Endpoints.User.get_posts("@user", %{ include_muted: true, include_annotations: false }, %{count: 5, before_id: 2} )
-			{:error, :invalid_parameter_to_parse}
-
-			iex> ElixirADN.Endpoints.User.get_posts("@user", %ElixirADN.Endpoints.Parameters.PostParameters{ include_muted: 5 }, %ElixirADN.Endpoints.Parameters.Pagination{} )
-			{:error, {:invalid_boolean_value, :include_muted, 5} }
-
-			iex> ElixirADN.Endpoints.User.get_posts("@user", %ElixirADN.Endpoints.Parameters.PostParameters{ include_muted: true }, %ElixirADN.Endpoints.Parameters.Pagination{count: 201} )
-			{:error, {:value_out_of_range, :count, 201} }
-
-			iex> ElixirADN.Endpoints.User.get_posts("@user", %ElixirADN.Endpoints.Parameters.PostParameters{ include_muted: true }, %ElixirADN.Endpoints.Parameters.Pagination{count: -201} )
-			{:error, {:value_out_of_range, :count, -201} }
-
-			iex> ElixirADN.Endpoints.User.get_posts(410, %ElixirADN.Endpoints.Parameters.PostParameters{ }, %ElixirADN.Endpoints.Parameters.Pagination{} )
-			{:get, "https://api.app.net/users/410/posts" }
-
-
+	Returns the posts for a given user taking into account the parameter objects
+	passed in
 	"""
 	def get_posts(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination) when is_binary(user_id) do
-		case String.at(user_id, 0) do
+		result = case String.at(user_id, 0) do
 			nil -> {:error, :no_account_name}
 			"@" -> process_get_posts(user_id, post_parameters, pagination)
 			_ -> {:error, :invalid_account_name_format	}			
 		end
+		case result do
+			{:error, _} -> result
+			_ -> parse_to_posts(result)
+		end
 	end
 
 	def get_posts(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination) when is_integer(user_id) do
-		process_get_posts(user_id, post_parameters, pagination)
+		result = process_get_posts(user_id, post_parameters, pagination)
+		case result do
+			{:error, _} -> result
+			_ -> parse_to_posts(result)
+		end
 	end
 
 	def get_posts(_, _, _) do
 		{:error, :invalid_parameter_to_parse}
 	end
 
+	defp parse_to_posts(%HTTPotion.Response{body: body}) do
+		{result, value} = BaseParser.parse(:users, body)
+		case result do
+			:ok -> BaseParser.decode(:posts, value, Post)
+			:error -> {:error, value}
+		end
+	end
 
 	defp process_get_posts(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination ) do
 		query_string_result = Encoder.generate_query_string([post_parameters, pagination])
 
 		case query_string_result do
-			{:ok, query_string} -> {:get, "https://api.app.net/users/#{user_id}/posts#{query_string}"}
+			{:ok, query_string} -> call({:get, "https://api.app.net/users/#{user_id}/posts#{query_string}"})
 			error -> error
 		end	
+	end
+
+	defp call({:get, url}) do
+		return_on_success = HTTPotion.get(url)
+		%HTTPotion.Response{ status_code: code } = return_on_success
+		success = StatusParser.parse_status(code)
+		case success do
+			{:ok, _message} -> return_on_success
+			{:error, message} -> {:error, message}
+		end
 	end
 end

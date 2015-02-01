@@ -31,13 +31,13 @@ defmodule ElixirADN.Behaviours.Bot do
 	@doc ~S"""
 	Starts the bot and waits for messages
 	"""
-	def start_bot(bot_logic, account_name, auth_token) do
+	def start_bot(bot_logic, account_name, auth_token, interval_seconds) do
 		#every minute? we look for new data
 		last_post_id = get_last_post_id(account_name)
 		last_message_id = get_last_message_id(account_name)
 		{:ok, post_ref} = Agent.start_link (fn -> last_post_id end)
 		{:ok, message_ref} = Agent.start_link (fn -> last_message_id end)
-		{:ok, {:interval, timer_ref}} = apply_interval 30 |> seconds do
+		{:ok, {:interval, timer_ref}} = apply_interval interval_seconds |> seconds do
 			check_for_posts(bot_logic, account_name, auth_token, post_ref)
 			check_for_messages(bot_logic, account_name, auth_token, message_ref)
 		end

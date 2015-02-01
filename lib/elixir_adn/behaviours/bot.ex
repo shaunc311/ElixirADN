@@ -31,15 +31,11 @@ defmodule ElixirADN.Behaviours.Bot do
 	@doc ~S"""
 	Starts the bot and waits for messages
 	"""
-	def start_bot(bot_logic, account_name, auth_token, interval_seconds) do
+	def start_bot(bot_logic, account_name, auth_token, start_post_id, interval_seconds) do
 		#every minute? we look for new data
-		last_post_id = get_last_post_id(account_name)
-		last_message_id = get_last_message_id(account_name)
-		{:ok, post_ref} = Agent.start_link (fn -> last_post_id end)
-		{:ok, message_ref} = Agent.start_link (fn -> last_message_id end)
+		{:ok, post_ref} = Agent.start_link (fn -> start_post_id end)
 		{:ok, {:interval, timer_ref}} = apply_interval interval_seconds |> seconds do
 			check_for_posts(bot_logic, account_name, auth_token, post_ref)
-			check_for_messages(bot_logic, account_name, auth_token, message_ref)
 		end
 		{:ok, timer_ref}
 	end
@@ -55,36 +51,8 @@ defmodule ElixirADN.Behaviours.Bot do
 				#these come in reverse post order, so the top one is the newest
 				post = hd(posts)
 				Agent.update(post_ref, fn(_old_post_id) -> post.id end)
-				store_last_post_id(account_name, post.id)
 		end
 		:ok
 	end
 
-	def check_for_messages(_bot_logic, _account_name, _auth_token, _message_ref) do
-		#IO.puts "messages!"
-	end
-
-	defp get_last_post_id(account_name) do
-		path = "#{account_name}.last_post_id"
-		case File.exists?(path) do
-			false -> "0"
-			true -> File.read!(path)
-		end
-	end
-
-	defp store_last_post_id(account_name, value) do
-		File.write("#{account_name}.last_post_id", value)
-	end
-
-	defp get_last_message_id(account_name) do
-		path = "#{account_name}.last_message_id"
-		case File.exists?(path) do
-			false -> "0"
-			true -> File.read!(path)
-		end
-	end
-
-	defp store_last_message_id(account_name, value) do
-		File.write("#{account_name}.last_message_id", value)
-	end
 end

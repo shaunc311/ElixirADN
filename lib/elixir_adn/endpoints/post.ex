@@ -21,9 +21,9 @@ defmodule ElixirADN.Endpoints.Post do
 	end
 
 
+	#Call the post endpoint with the json post
 	defp process_add_post(token, %Post{} = post ) do
 		body = Encoder.generate_json(post)
-		IO.puts body
 		Http.call({:post, "https://api.app.net/posts"}, [body: body, headers: ["Authorization": "Bearer #{token}", "Content-Type": "application/json"]])	
 	end
 end

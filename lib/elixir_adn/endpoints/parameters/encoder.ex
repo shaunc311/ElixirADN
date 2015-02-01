@@ -96,9 +96,42 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 	#that should already check this
 	defp convert_to_query_string(_), do: {:error, :invalid_object_to_parse}
 
+	@doc ~S"""
+	Turns a Post object into a valid map of data for ADN
+
+	It currently supports these values:
+		text
+		reply_to
+
+	ADN also supports the following attributes that this module doesn't support yet:
+		machine_only
+		annotations
+		entities 
+
+
+
+	## Examples
+
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Post{}) |> IO.iodata_to_binary
+			"{\"text\":\"\",\"reply_to\":null}"
+
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Post{text: "test"}) |> IO.iodata_to_binary
+			"{\"text\":\"test\",\"reply_to\":null}"
+
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Post{reply_to: "1"}) |> IO.iodata_to_binary
+			"{\"text\":\"\",\"reply_to\":\"1\"}"
+
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Post{text: "test", reply_to: "1"}) |> IO.iodata_to_binary
+			"{\"text\":\"test\",\"reply_to\":\"1\"}"
+
+	"""
 	def generate_json(%Post{text: text, reply_to: reply_to, machine_only: machine_only, annotations: annotations, entities: entities}) do
 		message = %{text: text, reply_to: reply_to}
 		Poison.Encoder.encode( message, [] )
+	end
+
+	def generate_json(_) do
+		{:error, :invalid_object_to_encode }
 	end
 
 	#Turn the struct into a query string

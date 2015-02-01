@@ -1,10 +1,10 @@
 defmodule ElixirADN.Endpoints.User do
+	alias ElixirADN.Endpoints.Http
 	alias ElixirADN.Endpoints.Parameters.Encoder
 	alias ElixirADN.Endpoints.Parameters.Pagination
 	alias ElixirADN.Endpoints.Parameters.PostParameters
 	alias ElixirADN.Model.Post
 	alias ElixirADN.Parser.ResultParser
-	alias ElixirADN.Parser.StatusParser
 
 	@moduledoc ~S"""
 	An interface to the user endpoints in ADN.  They are urls begining with 
@@ -84,7 +84,7 @@ defmodule ElixirADN.Endpoints.User do
 		query_string_result = Encoder.generate_query_string([post_parameters, pagination])
 
 		case query_string_result do
-			{:ok, query_string} -> call({:get, "https://api.app.net/users/#{user_id}/posts#{query_string}"}, [])
+			{:ok, query_string} -> Http.call({:get, "https://api.app.net/users/#{user_id}/posts#{query_string}"}, [])
 			error -> error
 		end	
 	end
@@ -94,20 +94,10 @@ defmodule ElixirADN.Endpoints.User do
 		query_string_result = Encoder.generate_query_string([post_parameters, pagination])
 
 		case query_string_result do
-			{:ok, query_string} -> call({:get, "https://api.app.net/users/#{user_id}/mentions#{query_string}"}, ["Authorization": "Bearer #{token}"])
+			{:ok, query_string} -> Http.call({:get, "https://api.app.net/users/#{user_id}/mentions#{query_string}"}, [headers: ["Authorization": "Bearer #{token}"]])
 			error -> error
 		end	
 	end
 
-	#A general function to call an http method.  This should be in it's own
-	#module eventually
-	defp call({:get, url}, headers) when is_list(headers) do
-		return_on_success = HTTPotion.get(url, headers)
-		%HTTPotion.Response{ status_code: code } = return_on_success
-		success = StatusParser.parse_status(code)
-		case success do
-			{:ok, _message} -> return_on_success
-			{:error, message} -> {:error, message}
-		end
-	end
+	
 end

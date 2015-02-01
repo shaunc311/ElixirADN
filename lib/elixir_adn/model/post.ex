@@ -57,5 +57,5 @@ defmodule ElixirADN.Model.Post do
 	  ]
 	}
 	"""
-	defstruct canonical_url: "", created_at: "", entities: nil, html: "", id: "", machine_only: false, num_replies: -1, num_reposts: -1, num_stars: -1, source: nil, text: "", thread_id: "", user: nil, you_reposted: false, you_starred: false, annotations: [], reposters: [], starred_by: []
+	defstruct canonical_url: "", created_at: "", entities: nil, html: "", id: "", machine_only: false, num_replies: -1, num_reposts: -1, num_stars: -1, reply_to: nil, source: nil, text: "", thread_id: "", user: nil, you_reposted: false, you_starred: false, annotations: [], reposters: [], starred_by: []
 end

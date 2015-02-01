@@ -1,4 +1,5 @@
 defmodule ElixirADN.Endpoints.Parameters.Encoder do
+	alias ElixirADN.Model.Post
 	alias ElixirADN.Endpoints.Parameters.Pagination
 	alias ElixirADN.Endpoints.Parameters.PostParameters
 	@moduledoc ~S"""
@@ -87,9 +88,18 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 		encode_parameters(pagination)
 	end
 
+	defp convert_to_query_string(%Post{} = post) do
+		encode_parameters(post)
+	end
+
 	#This shouldn't hit because encoder is only called from an endpoint
 	#that should already check this
 	defp convert_to_query_string(_), do: {:error, :invalid_object_to_parse}
+
+	def generate_json(%Post{text: text, reply_to: reply_to, machine_only: machine_only, annotations: annotations, entities: entities}) do
+		message = %{text: text, reply_to: reply_to}
+		Poison.Encoder.encode( message, [] )
+	end
 
 	#Turn the struct into a query string
 	defp encode_parameters(struct) do

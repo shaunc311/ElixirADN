@@ -10,7 +10,7 @@ defmodule ElixirADN.Endpoints.Post do
 	https://developers.app.net/reference/resources/	
 	"""	
 	@doc ~S"""
-	Post to ADN
+	Post to ADN.  This requests a user token.
 	"""
 	def create_post(user_token, %Post{} = post) when is_binary(user_token) do
 		process_add_post(user_token, post)
@@ -19,7 +19,6 @@ defmodule ElixirADN.Endpoints.Post do
 	def create_post(_,_) do
 		{:error, :invalid_object_to_post}
 	end
-
 
 	#Call the post endpoint with the json post
 	defp process_add_post(token, %Post{} = post ) do

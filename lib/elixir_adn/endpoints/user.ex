@@ -15,9 +15,10 @@ defmodule ElixirADN.Endpoints.User do
 
 	@doc ~S"""
 	Returns the posts for a given user taking into account the parameter objects
-	passed in
+	passed in.  The user id can be the @username format or the numerical id
 	"""
 	def get_posts(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination) when is_binary(user_id) do
+		#Make sure the string starts with @
 		result = case String.at(user_id, 0) do
 			nil -> {:error, :no_account_name}
 			"@" -> process_get_posts(user_id, post_parameters, pagination)
@@ -43,7 +44,8 @@ defmodule ElixirADN.Endpoints.User do
 
 	@doc ~S"""
 	Returns the posts mentioning a given user taking into account the parameter objects
-	passed in.  A token (app or user) is required
+	passed in.  A token (app or user) is required and the user_id can be either the 
+	@username format or a numerical id
 	"""
 	def get_mentions(user_id, token, %PostParameters{} = post_parameters, %Pagination{} = pagination) when is_binary(user_id) do
 		result = case String.at(user_id, 0) do

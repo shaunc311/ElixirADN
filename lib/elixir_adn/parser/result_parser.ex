@@ -18,7 +18,11 @@ defmodule ElixirADN.Parser.ResultParser do
 	alias ElixirADN.Model.Source
 	alias ElixirADN.Model.User
 	alias ElixirADN.Model.UserCounts
-
+	
+	@moduledoc ~S"""
+	This module processes the data coming back from ADN and creates
+	structs based on the results.
+	"""
 
 	@doc ~S"""
 	Parse post data coming back from ADN.  It's mapped data => values
@@ -26,7 +30,11 @@ defmodule ElixirADN.Parser.ResultParser do
 	data is ever needed it can be pulled from this map as well.
 	"""
 	def parse(atom, body) when is_binary(body) and atom in [:posts, :users, :channels, :messages, :files]  do
-		parse_data(body)
+		map = body
+			|> Poison.decode!
+			|> Map.get("data")
+
+		{:ok, map}
 	end
 
 	def parse(atom, body) when is_binary(body) and is_atom(atom) do
@@ -35,14 +43,6 @@ defmodule ElixirADN.Parser.ResultParser do
 
 	def parse(_,_) do
 		{:error, :invalid_data_to_parse}
-	end
-
-	defp parse_data(body) do
-		map = body
-			|> Poison.decode!
-			|> Map.get("data")
-
-		{:ok, map}
 	end
 
 	@doc ~S"""

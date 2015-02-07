@@ -1,4 +1,9 @@
 defmodule ElixirADN.Parser.StatusParser do
+	@moduledoc ~S"""
+	Parse the status codes coming from ADN, listed here:
+	https://developers.app.net/reference/make-request/responses/
+	"""
+	
 	@doc ~S"""
 	Validate the given response based on the status code.
 

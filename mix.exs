@@ -4,7 +4,7 @@ defmodule ElixirADN.Mixfile do
   def project do
     [app: :elixir_adn,
      version: "0.0.1",
-     elixir: "~> 1.1-dev",
+     elixir: "> 1.0.0",
      deps: deps]
   end
 

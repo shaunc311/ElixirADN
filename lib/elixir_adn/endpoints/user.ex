@@ -73,7 +73,7 @@ defmodule ElixirADN.Endpoints.User do
 
 
 	#Parse the response body into a map and then into objects
-	defp parse_to_posts(%HTTPotion.Response{body: body}) do
+	defp parse_to_posts(%HTTPoison.Response{body: body}) do
 		{result, value} = ResultParser.parse(:users, body)
 		case result do
 			:ok -> ResultParser.decode(:posts, value, Post)

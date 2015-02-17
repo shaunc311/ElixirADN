@@ -31,5 +31,5 @@ defmodule ElixirADN.Model.Message do
 
 	}
 	"""
-	defstruct channel_id: "", created_at: "", entities: nil, html: "", id: "", machine_only: false, num_replies: -1, source: nil, text: "", thread_id: "", user: nil, annotations: []
+	defstruct channel_id: "", created_at: "", entities: nil, html: "", id: "", machine_only: false, num_replies: -1, reply_to: nil, source: nil, text: "", thread_id: "", user: nil, annotations: []
 end

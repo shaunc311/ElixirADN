@@ -29,7 +29,7 @@ defmodule ElixirADN.Parser.ResultParser do
 	so it needs to get the data value after parsing.  If the meta 
 	data is ever needed it can be pulled from this map as well.
 	"""
-	def parse(atom, body) when is_binary(body) and atom in [:posts, :users, :channels, :messages, :files]  do
+	def parse(atom, body) when is_binary(body) and atom in [:posts, :users, :channels, :messages, :files, :stream]  do
 		map = body
 			|> Poison.decode!
 			|> Map.get("data")
@@ -60,6 +60,22 @@ defmodule ElixirADN.Parser.ResultParser do
 	def decode(token, value, as) when is_list(value) do
 		value
 			|> Enum.map( fn(x) -> decode(token, x, as) end)
+	end
+
+	#A stream can get any kind of object back so test for
+	#attributes
+	def decode(token, value, :stream) do
+		IO.inspect value
+		is_message = Map.has_key?(value, "channel_id")
+  	is_user = Map.has_key?(value, "username")
+  	is_channel = Map.has_key?(value, "owner")
+  	is_post = Map.has_key?(value, "num_reposts")
+  	cond do
+  		is_message -> decode(token, value, Message)
+  		is_user -> decode(token, value, User)
+  		is_channel -> decode(token, value, Channel)
+  		is_post -> decode(token, value, Post)
+  	end
 	end
 
 	# Decode the value and see if we need to decode any child elements

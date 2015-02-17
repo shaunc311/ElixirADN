@@ -3,7 +3,7 @@ defmodule ElixirADN.Mixfile do
 
   def project do
     [app: :elixir_adn,
-     version: "0.0.1",
+     version: "0.1.0",
      elixir: "> 1.0.0",
      deps: deps]
   end
@@ -26,10 +26,8 @@ defmodule ElixirADN.Mixfile do
   # Type `mix help deps` for more examples and options
   defp deps do
     [
-      {:block_timer, "~> 0.0.1"},
       {:mock, "~> 0.1.0"},
-      {:ibrowse, github: "cmullaparthi/ibrowse", tag: "v4.1.1"},
-      {:httpotion, "~> 2.0.0"},
+      {:httpoison, "~> 0.6.1"},
       {:poison, "~> 1.3.0"}
     ]
   end

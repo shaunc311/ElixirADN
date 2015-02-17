@@ -1,7 +1,11 @@
 defmodule ElixirADN.Endpoints.Parameters.Encoder do
+	alias ElixirADN.Model.Message
 	alias ElixirADN.Model.Post
 	alias ElixirADN.Endpoints.Parameters.Pagination
 	alias ElixirADN.Endpoints.Parameters.PostParameters
+	alias ElixirADN.Endpoints.Parameters.StreamEndpointParameters
+	alias ElixirADN.Endpoints.Parameters.SubscriptionParameters
+
 	@moduledoc ~S"""
 	This module encodes a list of parameter objects into a query string.  It currently 
 	works with Pagination and Post Parameters.
@@ -54,6 +58,18 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{include_annotations: false}, %ElixirADN.Endpoints.Parameters.Pagination{}]
 			{:ok, "?include_annotations=0" }
 
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.SubscriptionParameters{include_incomplete: false}]
+			{:ok, "?include_incomplete=0" }
+
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.SubscriptionParameters{include_incomplete: false}]
+			{:ok, "?include_incomplete=0" }
+
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.SubscriptionParameters{file_types: "bad"}]
+			{:ok, "?file_types=bad" }
+
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.StreamEndpointParameters{include_annotations: false}]
+			{:ok, "?include_annotations=0" }
+
 			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{include_muted: 1}, %ElixirADN.Endpoints.Parameters.Pagination{}]
 			{:error, {:invalid_boolean_value, :include_muted, 1 }} 
 
@@ -92,6 +108,14 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 		encode_parameters(post)
 	end
 
+	defp convert_to_query_string(%StreamEndpointParameters{} = stream_parameters) do
+		encode_parameters(stream_parameters)
+	end
+
+	defp convert_to_query_string(%SubscriptionParameters{} = sub_parameters) do
+		encode_parameters(sub_parameters)
+	end
+
 	#This shouldn't hit because encoder is only called from an endpoint
 	#that should already check this
 	defp convert_to_query_string(_), do: {:error, :invalid_object_to_parse}
@@ -124,8 +148,19 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Post{text: "test", reply_to: "1"}) |> IO.iodata_to_binary
 			"{\"text\":\"test\",\"reply_to\":\"1\"}"
 
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Message{text: "test", reply_to: "1"}) |> IO.iodata_to_binary
+			"{\"text\":\"test\",\"reply_to\":\"1\"}"
+
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Message{text: "test", channel_id: "4", reply_to: "1"}) |> IO.iodata_to_binary
+			"{\"text\":\"test\",\"reply_to\":\"1\"}"
+
 	"""
 	def generate_json(%Post{text: text, reply_to: reply_to, machine_only: machine_only, annotations: annotations, entities: entities}) do
+		message = %{text: text, reply_to: reply_to}
+		Poison.Encoder.encode( message, [] )
+	end
+
+	def generate_json(%Message{text: text, reply_to: reply_to, machine_only: machine_only, annotations: annotations, entities: entities}) do
 		message = %{text: text, reply_to: reply_to}
 		Poison.Encoder.encode( message, [] )
 	end
@@ -184,6 +219,20 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 		result
 	end
 
+	defp validate(%StreamEndpointParameters{} = stream_parameters) do
+		result = Map.keys(stream_parameters)
+			|> Enum.reduce( :ok, fn(key,acc) -> validate_boolean_parameter(acc, key, Map.get(stream_parameters, key)) end)
+		result
+	end
+
+	defp validate(%SubscriptionParameters{} = sub_parameters) do
+		result = Map.keys(sub_parameters)
+			#Only check the boolean parameters
+			|> Enum.filter( fn(x) -> x in [:include_incomplete, :include_private, :include_read, :include_muted, :include_deleted, :include_machine, :include_directed_posts] end)
+			|> Enum.reduce( :ok, fn(key,acc) -> validate_boolean_parameter(acc, key, Map.get(sub_parameters, key)) end)
+		result
+	end
+
 	#ignore the struct key
 	defp encode(acc, :__struct__, _), do: acc
 	#ignore any defaulted keys
@@ -214,11 +263,9 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 		{:error, {:invalid_boolean_value, parameter, value}}
 	end
 
-	defp join_parameters(["",""]), do: ""
-	defp join_parameters(["",value]) when is_binary(value), do: value
-	defp join_parameters([value, ""]) when is_binary(value), do: value
-	defp join_parameters([one, two]) when is_binary(one) and is_binary(two) do
-		one <> "&" <> two
+	defp join_parameters(param_list) when is_list(param_list) do
+		Enum.filter( param_list, fn(x) -> x != "" end)
+			|> Enum.join("&")
 	end
 
 	defp gather_parameters(_value, {:error, error}), do: {:error, error} 

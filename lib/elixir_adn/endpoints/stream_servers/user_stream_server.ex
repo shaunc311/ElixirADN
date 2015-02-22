@@ -42,7 +42,7 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
   will stay open after the call returns
   """
   def handle_call({:setup_stream, user_token, _stream_parameters}, _from, _state) do
-    HTTPoison.get("https://stream-channel.app.net/stream/user?autodelete=1", [{"Authorization", "Bearer #{user_token}"}], stream_to: self())
+  	HTTPoison.get("https://stream-channel.app.net/stream/user?autodelete=1", [{"Authorization", "Bearer #{user_token}"}], timeout: :infinity, stream_to: self())
 		#Wait for the connection id header to come in
 		connection_id_result = stream_for_connection_id()
 		case connection_id_result do
@@ -58,7 +58,6 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
   return it, otherwise recurse until we get a valid item
   """
   def handle_call({:get_next_item}, from, state) do
-  	IO.puts "waiting"
     receive do
     	#If it's a header (it shouldn't be) just continue waiting
     	%HTTPoison.AsyncHeaders{} ->
@@ -82,10 +81,15 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 				{:reply, {:halt, self}, state }
 			#Something else (included for debugging)
 			var ->
-				IO.puts "var"
+				IO.puts "unknown value"
 				IO.inspect var
 				{:reply, {:halt, self}, state }
 		end
+  end
+
+  #\r\n is the item seperator so return nil so it gets skipped
+  defp process_chunk("\r\n") do
+  	nil
   end
 
   #Decode an item from the stream
@@ -96,12 +100,10 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 
   #Wait for the connection id
 	defp stream_for_connection_id() do
-		IO.puts "streaming for id"
   	receive do
   		#Stream was created correctly which is good
   		#but it's not the connection id so keep waiting
   		%HTTPoison.AsyncStatus{code: 200} -> 
-				IO.puts "ok status"
 				stream_for_connection_id
 
 			#A user can only have 5 streams so if it's
@@ -127,6 +129,7 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 			#Some other message came back, just here
 			#for debugging
 			x ->
+				IO.puts "Unexpected value"
 				IO.inspect x
 				stream_for_connection_id
 		end
@@ -135,7 +138,6 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
   #Pull the connection id from the header
 	defp get_connection_id(%HTTPoison.AsyncHeaders{headers: headers}) do
 		connection_id = Map.get(headers, "Connection-Id")
-		IO.puts connection_id
 		{:ok, connection_id}
 	end
 end

@@ -65,7 +65,6 @@ defmodule ElixirADN.Parser.ResultParser do
 	#A stream can get any kind of object back so test for
 	#attributes
 	def decode(token, value, :stream) do
-		IO.inspect value
 		is_message = Map.has_key?(value, "channel_id")
   	is_user = Map.has_key?(value, "username")
   	is_channel = Map.has_key?(value, "owner")

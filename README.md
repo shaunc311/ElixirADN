@@ -26,8 +26,15 @@ Create a post or reply
 post = %ElixirADN.Model.Post{text: "hi"}
 ElixirADN.Endpoints.Post.create_post("auth_token", post)
 ```
+
+## Create a message
+Create a message
+```elixir
+post = %ElixirADN.Model.Message{text: "hi"}
+ElixirADN.Endpoints.Channel.create_message("auth_token", post)
+```
 #Bot Behaviour
-A way to create bots that listen for post mentions and can act on them.  To create a bot use the Bot behaviour like below:
+A way to create bots that listen to user streams and can act on them.  To create a bot use the Bot behaviour like below:
 
 ```elixir
 defmodule ExampleBot do
@@ -37,8 +44,8 @@ defmodule ExampleBot do
 The behaviour requires implementation of:
 
 ```elixir
-on_post_mention(%ElixirADN.Model.Post{} = post)
-on_message_mention(%ElixirADN.Model.Message{} = message)
+on_post_mention(%ElixirADN.Model.Post{})
+on_message_mention(%ElixirADN.Model.Message{})
 ```
 
 This function should define what happens when a post or message mentions the bot.
@@ -50,4 +57,4 @@ ElixirADN.Behaviours.Bot.start_bot(ExampleBot, "@username", "auth_token", %Elixi
 ```
 
 The parameters are the bot module name, the bots username, the auth token 
-associated with the account, the parameters to use when creating the user stream and a list of subscriptions the stream should subscribe to.
+associated with the account, the parameters to use when creating the user stream, and a list of subscriptions the stream should subscribe to.

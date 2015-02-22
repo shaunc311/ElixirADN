@@ -36,9 +36,8 @@ defmodule ElixirADN.Behaviours.Bot do
 	@doc ~S"""
 	Starts the bot and waits for messages on the given interval
 	"""
-	def start_bot(bot_logic, username, auth_token) do
-		#UserStream.stream(auth_token, %StreamEndpointParameters{}, [{:my_mentions, %SubscriptionParameters{}}])
-		UserStream.stream(auth_token, %StreamEndpointParameters{}, [{:channel_messages, "59922", %SubscriptionParameters{}}])
+	def start_bot(bot_logic, username, auth_token, %StreamEndpointParameters{} = endpoint_parameters, subscriptions) when is_list(subscriptions) do
+		UserStream.stream(auth_token, endpoint_parameters, subscriptions)
 			|> Stream.filter( fn(x) -> not_from_bot?(username,x) end)
 			|> Stream.filter( fn(x) -> mentions_bot?(username,x) end)
 			|> Enum.map( fn(x) -> apply( bot_logic, :on_message_mention, [x]) end)

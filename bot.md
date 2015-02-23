@@ -50,7 +50,7 @@ defmodule MagicEightBallBot do
 
   #Create a post to respond to the initial post
   defp create_post(response, post) do
-  	ElixirADN.Model.Post{ text: response, reply_to: post.id}
+  	%ElixirADN.Model.Post{ text: response, reply_to: post.id}
   end
 end
 ```

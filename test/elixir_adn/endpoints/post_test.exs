@@ -1,10 +1,12 @@
 defmodule ElixirADN.Endpoints.PostTest do
 	use ExUnit.Case, async: false
-
+  alias ElixirADN.Endpoints.Parameters.PostParameters
+  alias ElixirADN.Endpoints.Parameters.Pagination
   import Mock
 
   setup_all do 
-  	doc = %HTTPoison.Response{ status_code: 200, body: "", headers: [] }
+    body = File.read!("./test/elixir_adn/parser/posts.json")
+  	doc = %HTTPoison.Response{ status_code: 200, body: body, headers: [] }
   	{:ok, doc: doc}
   end
 
@@ -15,5 +17,13 @@ defmodule ElixirADN.Endpoints.PostTest do
     
   	assert result == doc
   	assert called HTTPoison.post!("https://api.app.net/posts", expected_body, [{"Authorization", "Bearer token"}, {"Content-Type", "application/json"}])
+  end
+
+  test_with_mock "read post", %{doc: doc}, HTTPoison, [:passthrough],
+    [get!: fn(_url, []) -> doc end] do
+    {:ok, posts } = ElixirADN.Endpoints.Post.get_posts(%PostParameters{}, %Pagination{})
+    
+    assert called HTTPoison.get!("https://api.app.net/posts/stream/global", [])
+    assert Enum.count(posts) == 1
   end
 end

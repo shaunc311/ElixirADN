@@ -40,8 +40,27 @@ defmodule ElixirADN.Behaviours.Bot do
 		UserStream.stream(auth_token, endpoint_parameters, subscriptions)
 			|> Stream.filter( fn(x) -> not_from_bot?(username,x) end)
 			|> Stream.filter( fn(x) -> mentions_bot?(username,x) end)
-			|> Enum.map( fn(x) -> apply( bot_logic, :on_message_mention, [x]) end)
+			|> Enum.map( fn(x) -> call_into_bot( bot_logic, x) end)
+	end
 
+	defp call_into_bot(bot_logic, %ElixirADN.Model.Channel{recent_message: message} ) do
+		apply(bot_logic, :on_message_mention, [message])
+	end
+
+	defp call_into_bot(bot_logic, %ElixirADN.Model.Message{} = message ) do
+		apply(bot_logic, :on_message_mention, [message])
+	end
+
+	defp call_into_bot(bot_logic, %ElixirADN.Model.Post{} = post ) do
+		apply(bot_logic, :on_post_mention, [post])
+	end
+
+	defp mentions_bot?(username, %ElixirADN.Model.Channel{recent_message: nil}) do
+		false
+	end
+
+	defp mentions_bot?(username, %ElixirADN.Model.Channel{recent_message: message}) do
+		mentions?(username, message.entities.mentions)
 	end
 
 	defp mentions_bot?(username, %ElixirADN.Model.Message{} = message) do
@@ -50,6 +69,15 @@ defmodule ElixirADN.Behaviours.Bot do
 
 	defp mentions_bot?(username, %ElixirADN.Model.Post{} = post) do
 		mentions?(username, post.entities.mentions)
+	end
+
+	#PMs with include recent message turned off
+	defp not_from_bot?(username, %ElixirADN.Model.Channel{recent_message: nil}) do
+		false
+	end
+
+	defp not_from_bot?(username, %ElixirADN.Model.Channel{recent_message: message}) do
+		is_not_bot?(username, message.user.username)
 	end
 
 	defp not_from_bot?(username, %ElixirADN.Model.Message{} = message) do

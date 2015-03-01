@@ -5,6 +5,7 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 	alias ElixirADN.Endpoints.Parameters.PostParameters
 	alias ElixirADN.Endpoints.Parameters.StreamEndpointParameters
 	alias ElixirADN.Endpoints.Parameters.SubscriptionParameters
+	alias ElixirADN.Endpoints.Parameters.UserParameters
 
 	@moduledoc ~S"""
 	This module encodes a list of parameter objects into a query string.  It currently 
@@ -76,6 +77,9 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.PostParameters{include_muted: true, include_deleted: true, include_directed_posts: true, include_machine: true, include_starred_by: true, include_reposters: true, include_annotations: true, include_post_annotations: true, include_user_annotations: true, include_html: true}, %ElixirADN.Endpoints.Parameters.Pagination{}]
 			{:ok, "?include_annotations=1&include_deleted=1&include_directed_posts=1&include_html=1&include_machine=1&include_muted=1&include_post_annotations=1&include_reposters=1&include_starred_by=1&include_user_annotations=1" }
 
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string [%ElixirADN.Endpoints.Parameters.UserParameters{include_annotations: true}]
+			{:ok, "?include_annotations=1" }
+
 			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_query_string ["hi", "hello"]
 			{:error, :invalid_object_to_parse }
 
@@ -114,6 +118,10 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 
 	defp convert_to_query_string(%SubscriptionParameters{} = sub_parameters) do
 		encode_parameters(sub_parameters)
+	end
+
+	defp convert_to_query_string(%UserParameters{} = user_parameters) do
+		encode_parameters(user_parameters)
 	end
 
 	#This shouldn't hit because encoder is only called from an endpoint
@@ -222,6 +230,12 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 	defp validate(%StreamEndpointParameters{} = stream_parameters) do
 		result = Map.keys(stream_parameters)
 			|> Enum.reduce( :ok, fn(key,acc) -> validate_boolean_parameter(acc, key, Map.get(stream_parameters, key)) end)
+		result
+	end
+
+	defp validate(%UserParameters{} = user_parameters) do
+		result = Map.keys(user_parameters)
+			|> Enum.reduce( :ok, fn(key,acc) -> validate_boolean_parameter(acc, key, Map.get(user_parameters, key)) end)
 		result
 	end
 

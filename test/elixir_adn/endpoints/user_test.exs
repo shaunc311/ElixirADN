@@ -3,13 +3,16 @@ defmodule ElixirADN.Endpoints.UserTest do
   alias ElixirADN.Endpoints.User
   alias ElixirADN.Endpoints.Parameters.PostParameters
   alias ElixirADN.Endpoints.Parameters.Pagination
-
+  alias ElixirADN.Endpoints.Parameters.UserParameters
+  
   import Mock
 
   setup_all do 
   	body = File.read!("./test/elixir_adn/parser/posts.json")
 		doc = %HTTPoison.Response{ status_code: 200, body: body, headers: [] }
-  	{:ok, doc: doc}
+  	user_body = File.read!("./test/elixir_adn/parser/users.json")
+    user_doc = %HTTPoison.Response{ status_code: 200, body: user_body, headers: [] }
+    {:ok, doc: doc, userdoc: user_doc}
   end
 
   test_with_mock "get posts for account", %{doc: doc}, HTTPoison, [:passthrough],
@@ -153,4 +156,33 @@ defmodule ElixirADN.Endpoints.UserTest do
 		assert message == {:value_out_of_range, :count, -201}
 	end
 
+  test "get with missing user name" do
+    {code, message} = User.get("", %UserParameters{} )
+    assert code == :error
+    assert message == :no_account_name
+  end
+
+  test "get with invalid user name" do
+    {code, message} = User.get("invalid", %UserParameters{} )
+    assert code == :error
+    assert message == :invalid_account_name_format
+  end
+
+  test_with_mock "get account", %{userdoc: userdoc}, HTTPoison, [:passthrough],
+    [get!: fn(_url, []) -> userdoc end] do
+
+    {:ok, users }= User.get("@shauncollins", %UserParameters{})
+    
+    assert called HTTPoison.get!("https://api.app.net/users/@shauncollins", [])
+    assert Enum.count(users) == 2
+  end
+
+  test_with_mock "get account by id", %{userdoc: userdoc}, HTTPoison, [:passthrough],
+    [get!: fn(_url, []) -> userdoc end] do
+
+    {:ok, users }= User.get(10, %UserParameters{})
+    
+    assert called HTTPoison.get!("https://api.app.net/users/10", [])
+    assert Enum.count(users) == 2
+  end
 end

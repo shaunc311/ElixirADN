@@ -41,8 +41,12 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
   Call the ADN endpoint to create the stream.  It's asynchonous so it 
   will stay open after the call returns
   """
-  def handle_call({:setup_stream, user_token, _stream_parameters}, _from, _state) do
-  	HTTPoison.get("https://stream-channel.app.net/stream/user?autodelete=1", [{"Authorization", "Bearer #{user_token}"}], timeout: :infinity, stream_to: self())
+  def handle_call({:setup_stream, user_token, stream_parameters}, _from, _state) do
+  	query_parameters = case ElixirADN.Endpoints.Parameters.Encoder.generate_query_string([stream_parameters]) do
+  		{:ok, "" } -> "?autodelete=1"
+  		{:ok, x } -> "#{x}&autodelete=1"
+  	end
+  	HTTPoison.get("https://stream-channel.app.net/stream/user#{query_parameters}", [{"Authorization", "Bearer #{user_token}"}], timeout: :infinity, stream_to: self())
 		#Wait for the connection id header to come in
 		connection_id_result = stream_for_connection_id()
 		case connection_id_result do
@@ -70,11 +74,13 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 			#an item we care about add it to the stream or
 			#continue waiting
 			%HTTPoison.AsyncChunk{chunk: chunk} ->
-				items = process_chunk(chunk)
+				items = get_all_chunks(chunk)
+					|> process_chunk()
 				case items do
 					nil -> handle_call({:get_next_item}, from, state)
 					_ -> {:reply, {items, self}, state}
 				end
+				
 			#End of the stream, but shouldn't happen with ADN streams
 			%HTTPoison.AsyncEnd{} ->
 				IO.puts "end"
@@ -87,6 +93,18 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 		end
   end
 
+
+  defp get_all_chunks(acc) do
+  	case String.ends_with?(acc, "\r\n") do
+			true -> 
+				acc
+			false ->
+				receive do
+					%HTTPoison.AsyncChunk{chunk: chunk} -> get_all_chunks(acc <> chunk)
+					%HTTPoison.AsyncEnd{} -> IO.puts "End?!"
+				end
+		end
+  end
   #\r\n is the item seperator so return nil so it gets skipped
   defp process_chunk("\r\n") do
   	nil

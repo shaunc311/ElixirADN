@@ -131,7 +131,7 @@ defmodule ElixirADN.Endpoints.User do
 		query_string_result = Encoder.generate_query_string([post_parameters, pagination])
 
 		case query_string_result do
-			{:ok, query_string} -> Http.call({:get, "https://api.app.net/users/#{user_id}/mentions#{query_string}"}, [headers: ["Authorization": "Bearer #{token}"]])
+			{:ok, query_string} -> Http.call({:get, "https://api.app.net/users/#{user_id}/mentions#{query_string}"}, [{"Authorization", "Bearer #{token}"}])
 			error -> error
 		end	
 	end

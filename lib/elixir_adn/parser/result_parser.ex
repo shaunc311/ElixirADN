@@ -29,7 +29,7 @@ defmodule ElixirADN.Parser.ResultParser do
 	so it needs to get the data value after parsing.  If the meta 
 	data is ever needed it can be pulled from this map as well.
 	"""
-	def parse(atom, body) when is_binary(body) and atom in [:posts, :users, :channels, :messages, :files, :stream]  do
+	def parse(atom, body) when is_binary(body) and atom in [:posts, :users, :channels, :messages, :files, :stream, :filters]  do
 		map = body
 			|> Poison.decode!
 			|> Map.get("data")

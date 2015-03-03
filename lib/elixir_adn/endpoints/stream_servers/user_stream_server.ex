@@ -1,4 +1,5 @@
 defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
+	alias ElixirADN.Endpoints.Http
 	alias ElixirADN.Parser.ResultParser
 	use GenServer
 
@@ -28,13 +29,17 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
     GenServer.call(server, {:get_next_item}, :infinity)
   end
 
+  def close_stream(server) do
+  	GenServer.call(server, {:close}, :infinity)
+  end
+
   ## Server Callbacks
 
   @doc """
   There is no initial state
   """
   def init(:ok) do
-    {:ok, nil}
+    {:ok, %{}}
   end
 
   @doc """
@@ -42,6 +47,7 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
   will stay open after the call returns
   """
   def handle_call({:setup_stream, user_token, stream_parameters}, _from, _state) do
+  	#Store the user token until we close the stream
   	query_parameters = case ElixirADN.Endpoints.Parameters.Encoder.generate_query_string([stream_parameters]) do
   		{:ok, "" } -> "?autodelete=1"
   		{:ok, x } -> "#{x}&autodelete=1"
@@ -51,9 +57,9 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 		connection_id_result = stream_for_connection_id()
 		case connection_id_result do
 			{:ok, connection_id} ->  
-				{:reply, {:ok, connection_id}, {:ok, connection_id}}
+				{:reply, {:ok, connection_id}, %{connection_id: connection_id, user_token: user_token}}
 			error -> 
-				{:reply, error, :ok}
+				{:reply, error, %{user_token: user_token}}
 		end
   end
 
@@ -93,6 +99,19 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 		end
   end
 
+  def handle_call({:close}, from, %{connection_id: connection_id, user_token: user_token} = state) when is_binary(connection_id) do
+  	#This returns no_content when it succeeds
+  	result = Http.call({:delete, "https://api.app.net/users/me/streams/#{connection_id}"}, [{"Authorization", "Bearer #{user_token}"}])
+  	case result do
+  		{:error, :no_content} -> {:reply, {:ok}, %{}}
+  		_ -> {:reply, {:halt, self}, state }
+  	end
+  end
+
+  def handle_call({:close}, from, _state) do
+  	#Stream  wasn't created so don't worry about closing it
+  	{:reply, {:ok}, %{}}
+  end
 
   defp get_all_chunks(acc) do
   	case String.ends_with?(acc, "\r\n") do
@@ -105,6 +124,7 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 				end
 		end
   end
+  
   #\r\n is the item seperator so return nil so it gets skipped
   defp process_chunk("\r\n") do
   	nil

@@ -73,9 +73,9 @@ defmodule ElixirADN.Endpoints.UserStream do
 	end
 
 	#Delete the stream
-	defp close_stream(_process_id) do
-		#currently they are created to auto-delete but this should 
-		#delete it
+	defp close_stream(pid) do
+		#delete it (can also be done with autodelete on the stream parameters)
+		UserStreamServer.close_stream(pid)
 	end
 
 	#Get the next item in the stream

@@ -15,18 +15,20 @@ defmodule ElixirADN.Endpoints.Http do
 	@doc ~S"""
 	A general function to post to an http endpoint and process the result.
 	"""
-	def call({:post, url}, body, headers) when is_list(headers) do
-		HTTPoison.post!(url, body, headers)
+	def call({:delete, url}, headers) when is_list(headers) do
+		HTTPoison.delete!(url, headers)
 			|> read_response
 	end
 
 	@doc ~S"""
 	A general function to post to an http endpoint and process the result.
 	"""
-	def call({:delete, url}, headers) when is_list(headers) do
-		HTTPoison.delete!(url, headers)
+	def call({:post, url}, body, headers) when is_list(headers) do
+		HTTPoison.post!(url, body, headers)
 			|> read_response
 	end
+
+	
 
 	#Parse the status code that comes back
 	defp read_response(%HTTPoison.Response{ status_code: code } = success_message) do

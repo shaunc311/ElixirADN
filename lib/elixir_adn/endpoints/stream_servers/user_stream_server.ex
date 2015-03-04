@@ -99,7 +99,7 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 		end
   end
 
-  def handle_call({:close}, from, %{connection_id: connection_id, user_token: user_token} = state) when is_binary(connection_id) do
+  def handle_call({:close}, _from, %{connection_id: connection_id, user_token: user_token} = state) when is_binary(connection_id) do
   	#This returns no_content when it succeeds
   	result = Http.call({:delete, "https://api.app.net/users/me/streams/#{connection_id}"}, [{"Authorization", "Bearer #{user_token}"}])
   	case result do
@@ -108,7 +108,7 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
   	end
   end
 
-  def handle_call({:close}, from, _state) do
+  def handle_call({:close}, _from, _state) do
   	#Stream  wasn't created so don't worry about closing it
   	{:reply, {:ok}, %{}}
   end

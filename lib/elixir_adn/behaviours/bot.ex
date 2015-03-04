@@ -1,6 +1,5 @@
 defmodule ElixirADN.Behaviours.Bot do
 	alias ElixirADN.Endpoints.Parameters.StreamEndpointParameters
-	alias ElixirADN.Endpoints.Parameters.SubscriptionParameters
 	alias ElixirADN.Endpoints.UserStream
 	use Behaviour
 
@@ -55,7 +54,7 @@ defmodule ElixirADN.Behaviours.Bot do
 		apply(bot_logic, :on_post_mention, [post])
 	end
 
-	defp mentions_bot?(username, %ElixirADN.Model.Channel{recent_message: nil}) do
+	defp mentions_bot?(_username, %ElixirADN.Model.Channel{recent_message: nil}) do
 		false
 	end
 
@@ -72,7 +71,7 @@ defmodule ElixirADN.Behaviours.Bot do
 	end
 
 	#PMs with include recent message turned off
-	defp not_from_bot?(username, %ElixirADN.Model.Channel{recent_message: nil}) do
+	defp not_from_bot?(_username, %ElixirADN.Model.Channel{recent_message: nil}) do
 		false
 	end
 

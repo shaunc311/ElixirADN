@@ -3,6 +3,7 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 	alias ElixirADN.Model.Filter
 	alias ElixirADN.Model.Message
 	alias ElixirADN.Model.Post
+	alias ElixirADN.Endpoints.Parameters.AppStreamParameters
 	alias ElixirADN.Endpoints.Parameters.Pagination
 	alias ElixirADN.Endpoints.Parameters.PostParameters
 	alias ElixirADN.Endpoints.Parameters.StreamEndpointParameters
@@ -167,6 +168,9 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Filter{name: "name", match_policy: "match_policy", clauses: [%ElixirADN.Model.Clause{field: "field", object_type: "object_type", operator: "operator", value: "value"}]}) |> IO.iodata_to_binary
 			"{\"name\":\"name\",\"match_policy\":\"match_policy\",\"clauses\":[{\"value\":\"value\",\"operator\":\"operator\",\"object_type\":\"object_type\",\"field\":\"field\"}]}"
 			
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Endpoints.Parameters.AppStreamParameters{object_types: ["object_types"], type: "type", filter_id: "filter_id", key: "key"}) |> IO.iodata_to_binary
+			"{\"type\":\"type\",\"object_types\":[\"object_types\"],\"key\":\"key\",\"filter_id\":\"filter_id\"}"
+			
 
 	"""
 	def generate_json(%Post{text: text, reply_to: reply_to, machine_only: machine_only, annotations: annotations, entities: entities}) do
@@ -182,6 +186,11 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 	def generate_json(%Filter{name: name, match_policy: match_policy, clauses: clauses}) do
 		clauses = Enum.map(clauses, fn(%Clause{field: field, object_type: object_type, operator: operator, value: value}) -> %{field: field, object_type: object_type, operator: operator, value: value} end)
 		%{ name: name, match_policy: match_policy, clauses: clauses}
+			|> Poison.Encoder.encode([])
+	end
+
+	def generate_json(%AppStreamParameters{object_types: object_types, type: type, filter_id: filter_id, key: key}) do
+		%{object_types: object_types, type: type, filter_id: filter_id, key: key}
 			|> Poison.Encoder.encode([])
 	end
 

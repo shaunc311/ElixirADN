@@ -1,4 +1,6 @@
 defmodule ElixirADN.Endpoints.Parameters.Encoder do
+	alias ElixirADN.Model.Clause
+	alias ElixirADN.Model.Filter
 	alias ElixirADN.Model.Message
 	alias ElixirADN.Model.Post
 	alias ElixirADN.Endpoints.Parameters.Pagination
@@ -162,6 +164,10 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Message{text: "test", channel_id: "4", reply_to: "1"}) |> IO.iodata_to_binary
 			"{\"text\":\"test\",\"reply_to\":\"1\"}"
 
+			iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Filter{name: "name", match_policy: "match_policy", clauses: [%ElixirADN.Model.Clause{field: "field", object_type: "object_type", operator: "operator", value: "value"}]}) |> IO.iodata_to_binary
+			"{\"name\":\"name\",\"match_policy\":\"match_policy\",\"clauses\":[{\"value\":\"value\",\"operator\":\"operator\",\"object_type\":\"object_type\",\"field\":\"field\"}]}"
+			
+
 	"""
 	def generate_json(%Post{text: text, reply_to: reply_to, machine_only: machine_only, annotations: annotations, entities: entities}) do
 		message = %{text: text, reply_to: reply_to}
@@ -171,6 +177,12 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
 	def generate_json(%Message{text: text, reply_to: reply_to, machine_only: machine_only, annotations: annotations, entities: entities}) do
 		message = %{text: text, reply_to: reply_to}
 		Poison.Encoder.encode( message, [] )
+	end
+
+	def generate_json(%Filter{name: name, match_policy: match_policy, clauses: clauses}) do
+		clauses = Enum.map(clauses, fn(%Clause{field: field, object_type: object_type, operator: operator, value: value}) -> %{field: field, object_type: object_type, operator: operator, value: value} end)
+		%{ name: name, match_policy: match_policy, clauses: clauses}
+			|> Poison.Encoder.encode([])
 	end
 
 	def generate_json(_) do

@@ -1,9 +1,6 @@
 defmodule ElixirADN.Endpoints.FilterTest do
 	use ExUnit.Case, async: false
   alias ElixirADN.Endpoints.Filter
-  alias ElixirADN.Endpoints.Parameters.PostParameters
-  alias ElixirADN.Endpoints.Parameters.Pagination
-  alias ElixirADN.Endpoints.Parameters.UserParameters
   
   import Mock
 
@@ -20,6 +17,17 @@ defmodule ElixirADN.Endpoints.FilterTest do
     
     assert called HTTPoison.get!("https://api.app.net/filters", [{"Authorization", "Bearer token"}])
     assert Enum.count(posts) == 1
+  end
+
+  test_with_mock "create a filter", %{doc: doc}, HTTPoison, [:passthrough],
+    [post!: fn(_url, _body, [{"Authorization", "Bearer token"},{"Content-Type", "application/json"}]) -> doc end] do
+
+    clause = %ElixirADN.Model.Clause{field: "/data/entities/hashtags/*/name", object_type: "post", operator: "matches", value: "Dragoon"}
+    filter = %ElixirADN.Model.Filter{clauses: [clause], match_policy: "include_any", name: "DragoonHashtag"}
+    Filter.create_filter("token", filter)
+    
+    filter_body = ElixirADN.Endpoints.Parameters.Encoder.generate_json(filter)
+    assert called HTTPoison.post!("https://api.app.net/filters", filter_body, [{"Authorization", "Bearer token"}, {"Content-Type", "application/json"}])
   end
 
 end

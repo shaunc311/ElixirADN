@@ -1,5 +1,6 @@
 defmodule ElixirADN.Endpoints.Filter do
 	alias ElixirADN.Endpoints.Http
+	alias ElixirADN.Endpoints.Parameters.Encoder
 	alias ElixirADN.Parser.ResultParser
 	@moduledoc ~S"""
 	An interface to the filters endpoints in ADN.  They are urls begining with 
@@ -18,6 +19,14 @@ defmodule ElixirADN.Endpoints.Filter do
 		end
 	end
 
+	@doc ~S"""
+	Create a filter.  Requires a user token.
+	"""
+	def create_filter(user_token, %ElixirADN.Model.Filter{} = filter) when is_binary(user_token) do
+		process_add_filters(user_token, filter)
+	end
+	
+
 	#make the get call with the auth token
 	defp process_get_filters(user_token) do
 		Http.call({:get, "https://api.app.net/filters"}, [{"Authorization", "Bearer #{user_token}"}])
@@ -30,5 +39,11 @@ defmodule ElixirADN.Endpoints.Filter do
 			:ok -> ResultParser.decode(:filters, value, ElixirADN.Model.Filter)
 			:error -> {:error, value}
 		end
+	end
+
+	#make the get call to add the filter
+	defp process_add_filters(user_token, filter) do
+		body = Encoder.generate_json(filter)
+		Http.call({:post, "https://api.app.net/filters"}, body, [{"Authorization","Bearer #{user_token}"}, {"Content-Type", "application/json"}])	
 	end
 end

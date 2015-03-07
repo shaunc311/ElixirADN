@@ -69,14 +69,6 @@ defmodule ElixirADN.Endpoints.UserTest do
   	assert Enum.count(posts) == 1
   end
 
-  test_with_mock "no content", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, []) -> %HTTPoison.Response{ status_code: 204} end] do
-
-    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
-		assert code == :error
-		assert message == :no_content
-  end
-
   test_with_mock "bad request", %{doc: doc}, HTTPoison, [:passthrough],
     [get!: fn(_url, []) -> %HTTPoison.Response{ status_code: 400} end] do
 

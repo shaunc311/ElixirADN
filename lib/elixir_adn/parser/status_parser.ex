@@ -13,7 +13,7 @@ defmodule ElixirADN.Parser.StatusParser do
 			{:ok, :success}
 
 			iex> ElixirADN.Parser.StatusParser.parse_status 204
-			{:error, :no_content}
+			{:ok, :no_content}
 
 			iex> ElixirADN.Parser.StatusParser.parse_status 302
 			{:ok, :found}
@@ -44,7 +44,7 @@ defmodule ElixirADN.Parser.StatusParser do
 
 	"""
 	def parse_status(200), do: {:ok, :success}
-	def parse_status(204), do: {:error, :no_content}
+	def parse_status(204), do: {:ok, :no_content}
 	def parse_status(302), do: {:ok, :found}
 	def parse_status(400), do: {:error, :bad_request}
 	def parse_status(401), do: {:error, :unauthorized}

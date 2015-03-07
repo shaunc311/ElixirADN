@@ -11,20 +11,20 @@ defmodule ElixirADN.Endpoints.FilterTest do
   end
 
   test_with_mock "get filters", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, [{"Authorization", "Bearer token"}]) -> doc end] do
+    [get!: fn(_url, [{"Authorization", "Bearer token"}, {"Content-Type", "application/json"}]) -> doc end] do
 
-    {:ok, posts } = Filter.get("token")
+    posts = Filter.get("token")
     
-    assert called HTTPoison.get!("https://api.app.net/filters", [{"Authorization", "Bearer token"}])
+    assert called HTTPoison.get!("https://api.app.net/filters", [{"Authorization", "Bearer token"}, {"Content-Type", "application/json"}])
     assert Enum.count(posts) == 1
   end
 
   test_with_mock "get a filter", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, [{"Authorization", "Bearer token"}]) -> doc end] do
+    [get!: fn(_url, [{"Authorization", "Bearer token"}, {"Content-Type", "application/json"}]) -> doc end] do
 
-    {:ok, posts } = Filter.get("token", "id")
+    posts = Filter.get("token", "id")
     
-    assert called HTTPoison.get!("https://api.app.net/filters/id", [{"Authorization", "Bearer token"}])
+    assert called HTTPoison.get!("https://api.app.net/filters/id", [{"Authorization", "Bearer token"}, {"Content-Type", "application/json"}])
     assert Enum.count(posts) == 1
   end
 

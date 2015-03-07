@@ -49,8 +49,8 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
   def handle_call({:setup_stream, app_token, stream_parameters}, _from, _state) do
   	#we need to create the stream to get the url
   	body = ElixirADN.Endpoints.Parameters.Encoder.generate_json(stream_parameters)
-  	%HTTPoison.Response{ body: body } = HTTPoison.post!("https://api.app.net/streams", body, [{"Authorization", "Bearer #{app_token}"}, {"Content-Type","application/json"}])
-  	{:ok, %{"endpoint" => endpoint, "id" => stream_id} } = ResultParser.parse(:stream, body)
+  	%{"endpoint" => endpoint, "id" => stream_id} =  HTTPoison.post!("https://api.app.net/streams", body, [{"Authorization", "Bearer #{app_token}"}, {"Content-Type","application/json"}])
+  	  |> ResultParser.convert_to(:map)
   	HTTPoison.get(endpoint, [{"Authorization", "Bearer #{app_token}"}], timeout: :infinity, stream_to: self())
   	{:reply, :ok, %{app_token: app_token, stream_id: stream_id}}
   end
@@ -129,7 +129,6 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
 
   #Decode an item from the stream
   defp process_chunk(chunk_json) do
-  	{:ok, map } = ResultParser.parse(:stream, chunk_json)
-  	ResultParser.decode("token", map, :stream)
+  	ResultParser.convert_to(chunk_json, :stream)
   end
 end

@@ -7,8 +7,13 @@ defmodule ElixirADN.Endpoints.Http do
 	@doc ~S"""
 	A general function to get an http request and process the result.
 	"""
-	def call({:get, url}, headers) when is_list(headers) do
-		HTTPoison.get!(url, headers)
+	def call({:get, url}) do
+		HTTPoison.get!(url,  [{"Content-Type", "application/json"}])
+			|> read_response
+	end
+
+	def call({:get, url}, token) when is_binary(token) do
+		HTTPoison.get!(url, [{"Authorization","Bearer #{token}"}, {"Content-Type", "application/json"}])
 			|> read_response
 	end
 
@@ -23,8 +28,8 @@ defmodule ElixirADN.Endpoints.Http do
 	@doc ~S"""
 	A general function to post to an http endpoint and process the result.
 	"""
-	def call({:post, url}, body, headers) when is_list(headers) do
-		HTTPoison.post!(url, body, headers)
+	def call(body, {:post, url}, token) when is_binary(token) do
+		HTTPoison.post!(url, body, [{"Authorization","Bearer #{token}"}, {"Content-Type", "application/json"}])
 			|> read_response
 	end
 

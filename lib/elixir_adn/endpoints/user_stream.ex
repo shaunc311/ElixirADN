@@ -41,7 +41,7 @@ defmodule ElixirADN.Endpoints.UserStream do
 	def subscribe_to_endpoint(endpoint, stream_id, user_token) when is_atom(stream_id) do
 		connection_id = Agent.get( stream_id, fn(x) -> x end)
 		{:ok, url} = Subscription.subscribe(endpoint, connection_id)
-		Http.call({:get, url}, ["Authorization": "Bearer #{user_token}"])
+		Http.call({:get, url}, user_token)
 	end
 
 
@@ -75,7 +75,6 @@ defmodule ElixirADN.Endpoints.UserStream do
 		#Return the PID so the other stream functions can access the server
 		%{pid: pid, stream_id: stream_id}
 	end
-
 	
 	#Delete the stream
 	defp close_stream(%{pid: pid, stream_id: stream_id}) do

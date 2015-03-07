@@ -132,8 +132,7 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
 
   #Decode an item from the stream
   defp process_chunk(chunk_json) do
-  	{:ok, map } = ResultParser.parse(:stream, chunk_json)
-  	ResultParser.decode("token", map, :stream)
+  	ResultParser.convert_to( chunk_json, :stream)
   end
 
   #Wait for the connection id

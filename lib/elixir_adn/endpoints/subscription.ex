@@ -13,9 +13,6 @@ defmodule ElixirADN.Endpoints.Subscription do
 			iex> ElixirADN.Endpoints.Subscription.subscribe( {:following_me, %ElixirADN.Endpoints.Parameters.SubscriptionParameters{include_incomplete: true}}, "5")
 			{:ok, "https://api.app.net/users/me/following?include_incomplete=1&connection_id=5" }
 
-			iex> ElixirADN.Endpoints.Subscription.subscribe( {:following_me, %ElixirADN.Endpoints.Parameters.SubscriptionParameters{include_incomplete: "bad"}}, "5")
-			{:error, {:invalid_boolean_value, :include_incomplete, "bad"}}
-
 			iex> ElixirADN.Endpoints.Subscription.subscribe( {:my_followers, %ElixirADN.Endpoints.Parameters.SubscriptionParameters{include_incomplete: true}}, "5" )
 			{:ok, "https://api.app.net/users/me/followers?include_incomplete=1&connection_id=5" }
 
@@ -107,11 +104,8 @@ defmodule ElixirADN.Endpoints.Subscription do
 	end
 
 	defp append_query_string(url, connection_id, %SubscriptionParameters{} = parameters) do
-		query_result = Encoder.generate_query_string([parameters])
-			case query_result do
-			{:ok, query_string} -> format_query_string(connection_id, url, query_string)
-			error -> error
-		end
+		{:ok, query_string} = Encoder.generate_query_string([parameters])
+		format_query_string(connection_id, url, query_string)
 	end
 
 	defp format_query_string(connection_id, url, query_string) do

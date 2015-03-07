@@ -20,10 +20,10 @@ defmodule ElixirADN.Endpoints.PostTest do
   end
 
   test_with_mock "read post", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, []) -> doc end] do
-    {:ok, posts } = ElixirADN.Endpoints.Post.get_posts(%PostParameters{}, %Pagination{})
+    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> doc end] do
+    posts = ElixirADN.Endpoints.Post.get_posts(%PostParameters{}, %Pagination{})
     
-    assert called HTTPoison.get!("https://api.app.net/posts/stream/global", [])
+    assert called HTTPoison.get!("https://api.app.net/posts/stream/global", [{"Content-Type", "application/json"}])
     assert Enum.count(posts) == 1
   end
 end

@@ -68,35 +68,8 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
   return it, otherwise recurse until we get a valid item
   """
   def handle_call({:get_next_item}, from, state) do
-    receive do
-    	#If it's a header (it shouldn't be) just continue waiting
-    	%HTTPoison.AsyncHeaders{} ->
-				handle_call({:get_next_item}, from, state)
-			#If it's an empty chunk, continue waiting
-			%HTTPoison.AsyncChunk{chunk: ""} ->
-				#Call it again
-				handle_call({:get_next_item}, from, state)
-			#If it's a valid chunk, process it and if it's
-			#an item we care about add it to the stream or
-			#continue waiting
-			%HTTPoison.AsyncChunk{chunk: chunk} ->
-				items = get_all_chunks(chunk)
-					|> process_chunk()
-				case items do
-					nil -> handle_call({:get_next_item}, from, state)
-					_ -> {:reply, {items, self}, state}
-				end
-				
-			#End of the stream, but shouldn't happen with ADN streams
-			%HTTPoison.AsyncEnd{} ->
-				IO.puts "end"
-				{:reply, {:halt, self}, state }
-			#Something else (included for debugging)
-			var ->
-				IO.puts "unknown value"
-				IO.inspect var
-				{:reply, {:halt, self}, state }
-		end
+    items = ElixirADN.Endpoints.StreamServers.Receiver.receive_message()
+    {:reply, {items, self}, state}
   end
 
   def handle_call({:close}, _from, %{connection_id: connection_id, user_token: user_token} = state) when is_binary(connection_id) do
@@ -112,29 +85,7 @@ defmodule ElixirADN.Endpoints.StreamServers.UserStreamServer do
   	#Stream  wasn't created so don't worry about closing it
   	{:reply, {:ok}, %{}}
   end
-
-  defp get_all_chunks(acc) do
-  	case String.ends_with?(acc, "\r\n") do
-			true -> 
-				acc
-			false ->
-				receive do
-					%HTTPoison.AsyncChunk{chunk: chunk} -> get_all_chunks(acc <> chunk)
-					%HTTPoison.AsyncEnd{} -> IO.puts "End?!"
-				end
-		end
-  end
   
-  #\r\n is the item seperator so return nil so it gets skipped
-  defp process_chunk("\r\n") do
-  	nil
-  end
-
-  #Decode an item from the stream
-  defp process_chunk(chunk_json) do
-  	ResultParser.convert_to( chunk_json, :stream)
-  end
-
   #Wait for the connection id
 	defp stream_for_connection_id() do
   	receive do

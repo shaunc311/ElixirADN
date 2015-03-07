@@ -50,7 +50,6 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
   	#we need to create the stream to get the url
   	body = ElixirADN.Endpoints.Parameters.Encoder.generate_json(stream_parameters)
   	%HTTPoison.Response{ body: body } = HTTPoison.post!("https://api.app.net/streams", body, [{"Authorization", "Bearer #{app_token}"}, {"Content-Type","application/json"}])
-  	IO.inspect body
   	{:ok, %{"endpoint" => endpoint, "id" => stream_id} } = ResultParser.parse(:stream, body)
   	HTTPoison.get(endpoint, [{"Authorization", "Bearer #{app_token}"}], timeout: :infinity, stream_to: self())
   	{:reply, :ok, %{app_token: app_token, stream_id: stream_id}}

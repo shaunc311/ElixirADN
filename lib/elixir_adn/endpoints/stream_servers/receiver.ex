@@ -1,5 +1,14 @@
 defmodule ElixirADN.Endpoints.StreamServers.Receiver do
 	alias ElixirADN.Parser.ResultParser
+	
+	@moduledoc ~S"""
+	A module to handle the common "waiting" code between user streams
+	and app streams
+	"""
+
+	@doc ~S"""
+	Wait for AsynchChunk with data in them
+	"""
 	def receive_message() do
 		receive do
     	#If it's a header (it shouldn't be) just continue waiting
@@ -16,6 +25,8 @@ defmodule ElixirADN.Endpoints.StreamServers.Receiver do
 			#an item we care about add it to the stream or
 			#continue waiting
 			%HTTPoison.AsyncChunk{chunk: chunk} ->
+				#basically keep reading the stream until
+				#all the chunks are a full object
 				item = get_all_chunks(chunk)
 					|> process_chunk()
 				case item do
@@ -39,6 +50,8 @@ defmodule ElixirADN.Endpoints.StreamServers.Receiver do
 	end
 
 
+	#Since a chunk is not guaranteed to be an entire
+	#object, keep reading until we get a \r\n 
 	defp get_all_chunks(acc) do
   	case String.ends_with?(acc, "\r\n") do
 			true -> 

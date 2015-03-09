@@ -32,7 +32,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse posts response", %{posts: posts} do
-    [%Post{} = post] = ResultParser.convert_to(posts, Post)
+    {:ok, [%Post{} = post]} = ResultParser.convert_to(posts, Post)
     
     assert post.canonical_url == "https://alpha.app.net/adn/post/914440"
     assert post.created_at == "2012-10-11T19:48:40Z"
@@ -50,7 +50,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse post entities", %{posts: posts} do
-    [%Post{} = post] = ResultParser.convert_to(posts, Post)
+    {:ok, [%Post{} = post]} = ResultParser.convert_to(posts, Post)
     
     %Entities{ hashtags: [hashtag], links: [link], mentions: mentions} = post.entities
     assert hashtag.len == 8
@@ -64,7 +64,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
   
   test "parse post source", %{posts: posts} do
-    [%Post{} = post] = ResultParser.convert_to(posts, Post)
+    {:ok, [%Post{} = post]} = ResultParser.convert_to(posts, Post)
     
     %Source{ client_id: client_id, link: link, name: name} = post.source
     assert client_id == "caYWDBvjwt2e9HWMm6qyKS6KcATHUkzQ"
@@ -73,7 +73,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse post user", %{posts: posts} do
-    [%Post{} = post] = ResultParser.convert_to(posts, Post)
+    {:ok, [%Post{} = post]} = ResultParser.convert_to(posts, Post)
     
 
     %Image{height: avatar_image_height, is_default: avatar_image_is_default, url: avatar_image_url, width: avatar_image_width} = post.user.avatar_image
@@ -128,7 +128,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse post annotations", %{posts: posts} do
-    [%Post{} = post] = ResultParser.convert_to(posts, Post)
+    {:ok, [%Post{} = post]} = ResultParser.convert_to(posts, Post)
     
     [%Annotation{ type: annotation_type, value: annotation_value}] = post.annotations
     assert annotation_type == "net.app.core.geolocation"
@@ -138,7 +138,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
 
   end
   test "parse post reposters", %{posts: posts} do
-    [%Post{} = post] = ResultParser.convert_to(posts, Post)
+    {:ok, [%Post{} = post]} = ResultParser.convert_to(posts, Post)
     
     [%User{id: reposter_id_1}, %User{id: reposter_id_2}] = post.reposters
     assert reposter_id_1 == "7"
@@ -146,14 +146,14 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse post starred_by", %{posts: posts} do
-    [%Post{} = post] = ResultParser.convert_to(posts, Post)
+    {:ok, [%Post{} = post]} = ResultParser.convert_to(posts, Post)
     
     [%User{id: star_id}] = post.starred_by
     assert star_id == "9"
   end
 
   test "parse user response", %{users: users} do
-    [%User{} = user1, _user2] = ResultParser.convert_to(users, User)
+    {:ok, [%User{} = user1, _user2]} = ResultParser.convert_to(users, User)
 
     assert user1.canonical_url == "https://alpha.app.net/adnapi"
     assert user1.created_at == "2012-08-10T22:40:12Z"
@@ -175,7 +175,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse user avatar image", %{users: users} do
-    [%User{} = user1, _user2] = ResultParser.convert_to(users, User)
+    {:ok, [%User{} = user1, _user2]} = ResultParser.convert_to(users, User)
 
     %UserCounts{followers: followers, following: following, posts: post_count, stars: stars} = user1.counts
     assert followers == 1549
@@ -185,7 +185,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse user counts", %{users: users} do
-    [%User{} = user1, _user2] = ResultParser.convert_to(users, User)
+    {:ok, [%User{} = user1, _user2]} = ResultParser.convert_to(users, User)
 
     %Image{height: avatar_image_height, is_default: avatar_image_is_default, url: avatar_image_url, width: avatar_image_width} = user1.avatar_image
     assert avatar_image_height == 200
@@ -196,7 +196,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
 
 
   test "parse user cover image", %{users: users} do
-    [%User{} = user1, _user2] = ResultParser.convert_to(users, User)
+    {:ok, [%User{} = user1, _user2]} = ResultParser.convert_to(users, User)
 
     %Image{height: cover_image_height, is_default: cover_image_is_default, url: cover_image_url, width: cover_image_width} = user1.cover_image
     assert cover_image_height == 260
@@ -206,7 +206,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse user description", %{users: users} do
-    [%User{} = user1, _user2] = ResultParser.convert_to(users, User)
+    {:ok, [%User{} = user1, _user2]} = ResultParser.convert_to(users, User)
 
     %Description{entities: %Entities{hashtags: hashtags, links: [link], mentions: mentions}, html: html, text: text} = user1.description
     assert hashtags == []
@@ -220,7 +220,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse channel response", %{channels: channels} do
-    [%Channel{} = channel1, _channel2] = ResultParser.convert_to(channels, Channel)
+    {:ok, [%Channel{} = channel1, _channel2]} = ResultParser.convert_to(channels, Channel)
     assert channel1.has_unread == false
     assert channel1.id == "2"
     assert channel1.is_inactive == false
@@ -232,7 +232,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse channel counts", %{channels: channels} do
-    [%Channel{} = channel1, _channel2] = ResultParser.convert_to(channels, Channel)
+    {:ok, [%Channel{} = channel1, _channel2]} = ResultParser.convert_to(channels, Channel)
     
     %ChannelCounts{messages: messages, subscribers: subscribers} = channel1.counts
     
@@ -241,7 +241,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse channel readers", %{channels: channels} do
-    [%Channel{} = channel1, _channel2] = ResultParser.convert_to(channels, Channel)
+    {:ok, [%Channel{} = channel1, _channel2]} = ResultParser.convert_to(channels, Channel)
     
     %ChannelPermissions{any_user: any_user, immutable: immutable, public: public, user_ids: user_ids, you: you} = channel1.readers
     
@@ -253,7 +253,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse channel editors", %{channels: channels} do
-    [%Channel{} = channel1, _channel2] = ResultParser.convert_to(channels, Channel)
+    {:ok, [%Channel{} = channel1, _channel2]} = ResultParser.convert_to(channels, Channel)
     
     %ChannelPermissions{any_user: any_user, immutable: immutable, public: public, user_ids: user_ids, you: you} = channel1.editors
     
@@ -265,7 +265,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse channel writers", %{channels: channels} do
-    [%Channel{} = channel1, _channel2] = ResultParser.convert_to(channels, Channel)
+    {:ok, [%Channel{} = channel1, _channel2]} = ResultParser.convert_to(channels, Channel)
     
     %ChannelPermissions{any_user: any_user, immutable: immutable, public: public, user_ids: user_ids, you: you} = channel1.writers
     
@@ -278,7 +278,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
 
 
   test "parse channel recent message", %{channels: channels} do
-    [%Channel{} = channel1, _channel2] = ResultParser.convert_to(channels, Channel)
+    {:ok, [%Channel{} = channel1, _channel2]} = ResultParser.convert_to(channels, Channel)
     
     message = channel1.recent_message
     
@@ -293,7 +293,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse channel recent message entities", %{channels: channels} do
-    [%Channel{} = channel1, _channel2] = ResultParser.convert_to(channels, Channel)
+    {:ok, [%Channel{} = channel1, _channel2]} = ResultParser.convert_to(channels, Channel)
     
     message = channel1.recent_message
     %Entities{hashtags: hashtags, links: links, mentions: mentions} = message.entities
@@ -303,7 +303,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse channel recent message source", %{channels: channels} do
-    [%Channel{} = channel1, _channel2] = ResultParser.convert_to(channels, Channel)
+    {:ok, [%Channel{} = channel1, _channel2]} = ResultParser.convert_to(channels, Channel)
     
     message = channel1.recent_message
     %Source{client_id: client_id, link: link, name: name} = message.source
@@ -313,14 +313,14 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse channel recent message user", %{channels: channels} do
-    [%Channel{} = channel1, _channel2] = ResultParser.convert_to(channels, Channel)
+    {:ok, [%Channel{} = channel1, _channel2]} = ResultParser.convert_to(channels, Channel)
     
     message = channel1.recent_message
     assert message.user.id == "1558"
   end
 
   test "parse message response", %{messages: messages} do
-    [%Message{} = message] = ResultParser.convert_to(messages, Message)
+    {:ok, [%Message{} = message]} = ResultParser.convert_to(messages, Message)
     assert message.channel_id == "1"
     assert message.created_at == "2012-12-11T00:31:49Z"
     assert message.html == "<span itemscope=\"https://app.net/schemas/Post\">Hello channel!</span>"
@@ -332,7 +332,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse files response", %{files: files} do
-    file = ResultParser.convert_to(files, ElixirADN.Model.File)
+    {:ok, file} = ResultParser.convert_to(files, ElixirADN.Model.File)
     assert file.complete == true
     assert file.created_at == "2013-01-28T18:31:18Z"
     assert file.file_token == "auCj3h64JZrhQ9aJdmwre3KP-QL9UtWHYvt5tj_64rUJWemoIV2W8eTJv9NMaGpBFk-BbU_aWA26Q40w4jFhiPBpnIQ_lciLwfh6o8YIAQGEQziksUMxZo7gOHJ_-niw3l3MZCh7QRWzqNGpiVaUEptfKO0fETrZ8bJjDa61234a"
@@ -349,7 +349,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse files derived files", %{files: files} do
-    file = ResultParser.convert_to(files, ElixirADN.Model.File)
+    {:ok, file} = ResultParser.convert_to(files, ElixirADN.Model.File)
     %DerivedFiles{image_thumb_200s: small, image_thumb_960r: regular} = file.derived_files
     assert small.name == "filename_image_thumb_200s.png"
     assert small.mime_type == "image/png"
@@ -370,7 +370,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse files image info", %{files: files} do
-    file = ResultParser.convert_to(files, ElixirADN.Model.File)
+    {:ok, file} = ResultParser.convert_to(files, ElixirADN.Model.File)
     %ImageInfo{width: width, height: height} = file.image_info
         
     assert width == 600
@@ -378,7 +378,7 @@ defmodule ElixirADN.Parser.ResultParserTest do
   end
 
   test "parse files source", %{files: files} do
-    file = ResultParser.convert_to(files, ElixirADN.Model.File)
+    {:ok, file} = ResultParser.convert_to(files, ElixirADN.Model.File)
     %Source{name: name, link: link, client_id: client_id} = file.source
         
     assert name == "Clientastic for iOS"

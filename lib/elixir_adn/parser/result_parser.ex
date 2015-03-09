@@ -30,17 +30,20 @@ defmodule ElixirADN.Parser.ResultParser do
 	data is ever needed it can be pulled from this map as well.
 	"""
 	def convert_to(%HTTPoison.Response{body: body}, :map) do
-		parse(body)
+		map = parse(body)
+		{:ok, map}
 	end
 
 	def convert_to(%HTTPoison.Response{body: body}, as) when is_atom(as) do
-		parse(body)
+		result = parse(body)
 			|> decode(as)
+		{:ok, result}
 	end
 
 	def convert_to(body, as) when is_binary(body) and is_atom(as) do
-		parse(body)
+		result = parse(body)
 			|> decode(as)
+		{:ok, result}
 	end
 
 	def convert_to({:error, error_code, error_message}, as) when is_atom(as) do
@@ -49,9 +52,10 @@ defmodule ElixirADN.Parser.ResultParser do
 
 	
 	defp parse(body) when is_binary(body) do
-		body
+		result = body
 			|> Poison.decode!
 			|> Map.get("data")
+		{:ok, result}
 	end
 
 	#Decode data into model objects using the Poison library.  Lists
@@ -59,111 +63,111 @@ defmodule ElixirADN.Parser.ResultParser do
 	#only does a shallow decode, we also have to decode the children
 	#of the given object
 	# Match on nil first
-	defp decode(nil, _) do
+	defp decode({:ok, nil}, _) do
 		nil
 	end
 
 	# If we get a list then map each element into a decoded value
-	defp decode(value, as) when is_list(value) do
+	defp decode({:ok, value}, as) when is_list(value) do
 		value
-			|> Enum.map( fn(x) -> decode(x, as) end)
+			|> Enum.map( fn(x) -> decode({:ok, x}, as) end)
 	end
 
 	#A stream can get any kind of object back so test for
 	#attributes
-	defp decode(value, :stream) do
-		is_message = Map.has_key?(value, "channel_id")
-  	is_user = Map.has_key?(value, "username")
-  	is_channel = Map.has_key?(value, "owner")
-  	is_post = Map.has_key?(value, "num_reposts")
+	defp decode({:ok, value}, :stream) do
+		is_message = Map.has_key?({:ok, value}, "channel_id")
+  	is_user = Map.has_key?({:ok, value}, "username")
+  	is_channel = Map.has_key?({:ok, value}, "owner")
+  	is_post = Map.has_key?({:ok, value}, "num_reposts")
   	cond do
-  		is_message -> decode(value, Message)
-  		is_user -> decode(value, User)
-  		is_channel -> decode(value, Channel)
-  		is_post -> decode(value, Post)
+  		is_message -> decode({:ok, value}, Message)
+  		is_user -> decode({:ok, value}, User)
+  		is_channel -> decode({:ok, value}, Channel)
+  		is_post -> decode({:ok, value}, Post)
   	end
 	end
 
 	# Decode the value and see if we need to decode any child elements
-	defp decode(value, as) do
-		result = Poison.Decode.decode(value, as: as)
-		_result = decode_children(result)
+	defp decode({:ok, value}, as) do
+		Poison.Decode.decode(value, as: as)
+			|> decode_children()
 	end
 
 	#Decode all the children properties from the post object
 	defp decode_children(%Post{} = post) do
 		post
-			|> Map.put( :entities, decode(post.entities, Entities))
-			|> Map.put( :source, decode(post.source, Source))
-			|> Map.put( :user, decode(post.user, User))
-			|> Map.put( :annotations, decode(post.annotations, Annotation))
-			|> Map.put( :reposters, decode(post.reposters, User))
-			|> Map.put( :starred_by, decode(post.starred_by, User))
+			|> Map.put( :entities, decode({:ok, post.entities}, Entities))
+			|> Map.put( :source, decode({:ok, post.source}, Source))
+			|> Map.put( :user, decode({:ok, post.user}, User))
+			|> Map.put( :annotations, decode({:ok, post.annotations}, Annotation))
+			|> Map.put( :reposters, decode({:ok, post.reposters}, User))
+			|> Map.put( :starred_by, decode({:ok, post.starred_by}, User))
 	end
 
 	#Decode all the children properties from the user object
 	defp decode_children(%User{} = user) do
 		user
-			|> Map.put( :avatar_image, decode(user.avatar_image, Image))
-			|> Map.put( :counts,  decode(user.counts, UserCounts))
-			|> Map.put( :cover_image, decode(user.cover_image, Image))
-			|> Map.put( :description, decode(user.description, Description))
-			|> Map.put( :annotations, decode(user.annotations, Annotation))
+			|> Map.put( :avatar_image, decode({:ok, user.avatar_image}, Image))
+			|> Map.put( :counts,  decode({:ok, user.counts}, UserCounts))
+			|> Map.put( :cover_image, decode({:ok, user.cover_image}, Image))
+			|> Map.put( :description, decode({:ok, user.description}, Description))
+			|> Map.put( :annotations, decode({:ok, user.annotations}, Annotation))
 	end
 
 	#Decode all the children properties from the entities object
 	defp decode_children(%Entities{} = entities) do
 		entities
-			|> Map.put( :hashtags, decode(entities.hashtags, Hashtag))
-			|> Map.put( :links,  decode(entities.links, Link))
-			|> Map.put( :mentions, decode(entities.mentions, Mention))
+			|> Map.put( :hashtags, decode({:ok, entities.hashtags}, Hashtag))
+			|> Map.put( :links,  decode({:ok, entities.links}, Link))
+			|> Map.put( :mentions, decode({:ok, entities.mentions}, Mention))
 	end
 
 	#Decode all the children properties from the description object
 	defp decode_children(%Description{} = description) do
 		description
-			|> Map.put( :entities, decode(description.entities, Entities))
+			|> Map.put( :entities, decode({:ok, description.entities}, Entities))
 	end
 
 	#Decode all the children properties from the channel object
 	defp decode_children(%Channel{} = channel) do
 		channel
-			|> Map.put( :counts, decode(channel.counts, ChannelCounts))
-			|> Map.put( :readers, decode(channel.readers, ChannelPermissions))
-			|> Map.put( :editors, decode(channel.editors, ChannelPermissions))
-			|> Map.put( :writers, decode(channel.writers, ChannelPermissions))
-			|> Map.put( :recent_message, decode(channel.recent_message, Message))
-			|> Map.put( :annotations, decode(channel.annotations, Annotation))
+			|> Map.put( :counts, decode({:ok, channel.counts}, ChannelCounts))
+			|> Map.put( :readers, decode({:ok, channel.readers}, ChannelPermissions))
+			|> Map.put( :editors, decode({:ok, channel.editors}, ChannelPermissions))
+			|> Map.put( :writers, decode({:ok, channel.writers}, ChannelPermissions))
+			|> Map.put( :recent_message, decode({:ok, channel.recent_message}, Message))
+			|> Map.put( :annotations, decode({:ok, channel.annotations}, Annotation))
 	end
 
 	#Decode all the children properties from the message object
 	defp decode_children(%Message{} = message) do
 		message
-			|> Map.put( :entities, decode(message.entities, Entities))
-			|> Map.put( :source, decode(message.source, Source))
-			|> Map.put( :user, decode(message.user, User))
-			|> Map.put( :annotations, decode(message.annotations, Annotation))
+			|> Map.put( :entities, decode({:ok, message.entities}, Entities))
+			|> Map.put( :source, decode({:ok, message.source}, Source))
+			|> Map.put( :user, decode({:ok, message.user}, User))
+			|> Map.put( :annotations, decode({:ok, message.annotations}, Annotation))
 	end
 
 	#Decode all the children properties from the file object
 	defp decode_children(%File{} = file) do
 		file
-			|> Map.put( :derived_files, decode(file.derived_files, DerivedFiles))
-			|> Map.put( :image_info, decode(file.image_info, ImageInfo))
-			|> Map.put( :source, decode(file.source, Source))
-			|> Map.put( :user, decode(file.user, User))
+			|> Map.put( :derived_files, decode({:ok, file.derived_files}, DerivedFiles))
+			|> Map.put( :image_info, decode({:ok, file.image_info}, ImageInfo))
+			|> Map.put( :source, decode({:ok, file.source}, Source))
+			|> Map.put( :user, decode({:ok, file.user}, User))
 	end
 
 	#Decode all the children properties from the derived file object
 	defp decode_children(%DerivedFiles{} = files) do
 		files
-			|> Map.put( :image_thumb_200s, decode(files.image_thumb_200s, ImageThumb))
-			|> Map.put( :image_thumb_960r, decode(files.image_thumb_960r, ImageThumb))
+			|> Map.put( :image_thumb_200s, decode({:ok, files.image_thumb_200s}, ImageThumb))
+			|> Map.put( :image_thumb_960r, decode({:ok, files.image_thumb_960r}, ImageThumb))
 	end
 
 	defp decode_children(%ImageThumb{} = thumb) do
 		thumb
-			|> Map.put( :image_info, decode(thumb.image_info, ImageInfo))
+			|> Map.put( :image_info, decode({:ok, thumb.image_info}, ImageInfo))
 	end
 
 	#Decode all the children properties from the description object

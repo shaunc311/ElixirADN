@@ -18,7 +18,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts for account", %{doc: doc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Content-Type", "application/json"}]) -> doc end] do
 
-    posts = User.get_posts("@shauncollins", %PostParameters{}, %Pagination{})
+    {:ok, posts} = User.get_posts("@shauncollins", %PostParameters{}, %Pagination{})
   	
   	assert called HTTPoison.get!("https://api.app.net/users/@shauncollins/posts", [{"Content-Type", "application/json"}])
   	assert Enum.count(posts) == 1
@@ -27,7 +27,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts for account with muted", %{doc: doc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Content-Type", "application/json"}]) -> doc end] do
 
-    posts = User.get_posts("@shauncollins", %PostParameters{include_muted: true}, %Pagination{})
+    {:ok, posts} = User.get_posts("@shauncollins", %PostParameters{include_muted: true}, %Pagination{})
   	
   	assert called HTTPoison.get!("https://api.app.net/users/@shauncollins/posts?include_muted=1", [{"Content-Type", "application/json"}])
   	assert Enum.count(posts) == 1
@@ -36,7 +36,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get mentions", %{doc: doc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Authorization", "Bearer token"},{"Content-Type", "application/json"}]) -> doc end] do
 
-    posts = User.get_mentions("@shauncollins", "token", %PostParameters{include_muted: true}, %Pagination{})
+    {:ok, posts} = User.get_mentions("@shauncollins", "token", %PostParameters{include_muted: true}, %Pagination{})
     
     assert called HTTPoison.get!("https://api.app.net/users/@shauncollins/mentions?include_muted=1", [{"Authorization", "Bearer token"},{"Content-Type", "application/json"}])
     assert Enum.count(posts) == 1
@@ -45,7 +45,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts with count", %{doc: doc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Content-Type", "application/json"}]) -> doc end] do
 
-    posts = User.get_posts("@shauncollins", %PostParameters{}, %Pagination{count: 5})
+    {:ok, posts} = User.get_posts("@shauncollins", %PostParameters{}, %Pagination{count: 5})
   	
   	assert called HTTPoison.get!("https://api.app.net/users/@shauncollins/posts?count=5", [{"Content-Type", "application/json"}])
   	assert Enum.count(posts) == 1
@@ -54,7 +54,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts with count and muted", %{doc: doc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Content-Type", "application/json"}]) -> doc end] do
 
-    posts = User.get_posts("@shauncollins", %PostParameters{include_muted: true}, %Pagination{count: 5})
+    {:ok, posts} = User.get_posts("@shauncollins", %PostParameters{include_muted: true}, %Pagination{count: 5})
   	
   	assert called HTTPoison.get!("https://api.app.net/users/@shauncollins/posts?include_muted=1&count=5", [{"Content-Type", "application/json"}])
   	assert Enum.count(posts) == 1
@@ -63,7 +63,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get posts by id number", %{doc: doc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Content-Type", "application/json"}]) -> doc end] do
 
-    posts = User.get_posts(410, %PostParameters{}, %Pagination{})
+    {:ok, posts} = User.get_posts(410, %PostParameters{}, %Pagination{})
   	
   	assert called HTTPoison.get!("https://api.app.net/users/410/posts", [{"Content-Type", "application/json"}])
   	assert Enum.count(posts) == 1
@@ -144,7 +144,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get account", %{userdoc: userdoc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Content-Type", "application/json"}]) -> userdoc end] do
 
-    users = User.get("@shauncollins", %UserParameters{})
+    {:ok, users} = User.get("@shauncollins", %UserParameters{})
     
     assert called HTTPoison.get!("https://api.app.net/users/@shauncollins", [{"Content-Type", "application/json"}])
     assert Enum.count(users) == 2
@@ -153,7 +153,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get account by id", %{userdoc: userdoc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Content-Type", "application/json"}]) -> userdoc end] do
 
-    users = User.get(10, %UserParameters{})
+    {:ok, users} = User.get(10, %UserParameters{})
     
     assert called HTTPoison.get!("https://api.app.net/users/10", [{"Content-Type", "application/json"}])
     assert Enum.count(users) == 2

@@ -1,4 +1,5 @@
 defmodule ElixirADN.Endpoints.Http do
+	alias ElixirADN.Parser.MetaParser
 	alias ElixirADN.Parser.StatusParser
 	@moduledoc ~S"""
 	A helper utility to send a request to a url and process it
@@ -36,11 +37,13 @@ defmodule ElixirADN.Endpoints.Http do
 	
 
 	#Parse the status code that comes back
-	defp read_response(%HTTPoison.Response{ status_code: code } = success_message) do
+	defp read_response(%HTTPoison.Response{ status_code: code, body: body } = success_message) do
 		success = StatusParser.parse_status(code)
 		case success do
 			{:ok, _message} -> success_message
-			{:error, message} -> {:error, message}
+			{:error, message} -> 
+				error_message = MetaParser.parse_error(body)
+				{:error, message, error_message}
 		end
 	end
 end

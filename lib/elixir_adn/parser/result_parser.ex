@@ -43,8 +43,8 @@ defmodule ElixirADN.Parser.ResultParser do
 			|> decode(as)
 	end
 
-	def convert_to({:error, message}, as) when is_atom(as) do
-		{:error, message}
+	def convert_to({:error, error_code, error_message}, as) when is_atom(as) do
+		{:error,  error_code, error_message}
 	end
 
 	

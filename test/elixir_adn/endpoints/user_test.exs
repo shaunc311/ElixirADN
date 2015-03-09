@@ -70,67 +70,75 @@ defmodule ElixirADN.Endpoints.UserTest do
   end
 
   test_with_mock "bad request", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 400} end] do
+    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 400, body: "{\"meta\":{\"error_message\":\"hi\"}}"} end] do
 
-    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
-		assert code == :error
-		assert message == :bad_request
+    {error, code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert error == :error
+    assert code == :bad_request
+    assert message == "hi"
   end
 
   test_with_mock "unauthorized", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 401} end] do
+    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 401, body: "{\"meta\":{\"error_message\":\"hi\"}}"} end] do
 
-    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
-		assert code == :error
-		assert message == :unauthorized
+    {error, code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert error == :error
+    assert code == :unauthorized
+    assert message == "hi"
   end
 
   test_with_mock "forbidden", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 403} end] do
+    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 403, body: "{\"meta\":{\"error_message\":\"hi\"}}"} end] do
 
-    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
-		assert code == :error
-		assert message == :forbidden
+    {error, code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert error == :error
+    assert code == :forbidden
+		assert message == "hi"
   end
 
   test_with_mock "not found", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 404} end] do
+    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 404, body: "{\"meta\":{\"error_message\":\"hi\"}}"} end] do
 
-    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
-		assert code == :error
-		assert message == :not_found
+    {error, code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert error == :error
+    assert code == :not_found
+    assert message == "hi"
   end
 
   test_with_mock "method not allowed", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 405} end] do
+    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 405, body: "{\"meta\":{\"error_message\":\"hi\"}}"} end] do
 
-    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
-		assert code == :error
-		assert message == :method_not_allowed
+    {error, code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert error == :error
+    assert code == :method_not_allowed
+    assert message == "hi"
   end
 
   test_with_mock "too many requests", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 429} end] do
+    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 429, body: "{\"meta\":{\"error_message\":\"hi\"}}"} end] do
 
-    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
-		assert code == :error
-		assert message == :too_many_requests
+    {error, code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert error == :error
+    assert code == :too_many_requests
+    assert message == "hi"
   end
 
   test_with_mock "internal server error", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url,[{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 500} end] do
+    [get!: fn(_url,[{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 500, body: "{\"meta\":{\"error_message\":\"hi\"}}"} end] do
 
-    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
-		assert code == :error
-		assert message == :internal_server_error
+    {error, code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert error == :error
+    assert code == :internal_server_error
+    assert message == "hi"
   end
 
   test_with_mock "insufficient storage", %{doc: doc}, HTTPoison, [:passthrough],
-    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 507} end] do
+    [get!: fn(_url, [{"Content-Type", "application/json"}]) -> %HTTPoison.Response{ status_code: 507, body: "{\"meta\":{\"error_message\":\"hi\"}}"} end] do
 
-    {code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
-		assert code == :error
-		assert message == :insufficient_storage
+    {error, code, message } = User.get_posts("@user", %PostParameters{ include_muted: true, include_annotations: false }, %Pagination{count: 5, before_id: 2} )
+		assert error == :error
+    assert code == :insufficient_storage
+    assert message == "hi"
   end
 
   test_with_mock "get account", %{userdoc: userdoc}, HTTPoison, [:passthrough],

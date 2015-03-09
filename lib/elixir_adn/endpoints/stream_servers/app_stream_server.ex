@@ -59,7 +59,7 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
   Wait for the stream to return an item.  If it's valid,
   return it, otherwise recurse until we get a valid item
   """
-  def handle_call({:get_next_item}, from, state) do
+  def handle_call({:get_next_item}, _from, state) do
     items = ElixirADN.Endpoints.StreamServers.Receiver.receive_message()
     {:reply, {items, self}, state}
   end

@@ -1,7 +1,7 @@
 defmodule ElixirADN.Model.Entities do
-	@doc ~S"""
-	An elixir representation of the ADN entities map found in the User map
-	{
+  @doc ~S"""
+  An elixir representation of the ADN entities map found in the User map
+  {
     "hashtags": [
 
     ],
@@ -17,6 +17,6 @@ defmodule ElixirADN.Model.Entities do
 
     ]
   }
-	"""
-	defstruct hashtags: [], links: [], mentions: []
+  """
+  defstruct hashtags: [], links: [], mentions: []
 end

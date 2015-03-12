@@ -1,7 +1,7 @@
 defmodule ElixirADN.Model.Filter do
-	@doc ~S"""
-	An elixir representation of the ADN filter map
-	{
+  @doc ~S"""
+  An elixir representation of the ADN filter map
+  {
     "clauses": [
       {
         "field": "/data/entities/hashtags/*/name",
@@ -15,6 +15,6 @@ defmodule ElixirADN.Model.Filter do
     "name": "Posts about rollouts",
     "owner": "...user object..."
   }
-	"""
-	defstruct clauses: [], id: "", match_policy: "", name: "", owner: nil
+  """
+  defstruct clauses: [], id: "", match_policy: "", name: "", owner: nil
 end

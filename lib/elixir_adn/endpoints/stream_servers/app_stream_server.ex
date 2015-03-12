@@ -1,7 +1,7 @@
 defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
-	alias ElixirADN.Endpoints.Http
-	alias ElixirADN.Parser.ResultParser
-	use GenServer
+  alias ElixirADN.Endpoints.Http
+  alias ElixirADN.Parser.ResultParser
+  use GenServer
 
   ## Client API
 
@@ -30,7 +30,7 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
   end
 
   def close_stream(server) do
-  	GenServer.call(server, {:close}, :infinity)
+    GenServer.call(server, {:close}, :infinity)
   end
 
   ## Server Callbacks
@@ -47,12 +47,12 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
   will stay open after the call returns
   """
   def handle_call({:setup_stream, app_token, stream_parameters}, _from, _state) do
-  	#we need to create the stream to get the url
-  	{:ok, %{"endpoint" => endpoint, "id" => stream_id}} = ElixirADN.Endpoints.Parameters.Encoder.generate_json(stream_parameters)
+    #we need to create the stream to get the url
+    {:ok, %{"endpoint" => endpoint, "id" => stream_id}} = ElixirADN.Endpoints.Parameters.Encoder.generate_json(stream_parameters)
       |> Http.call({:post, "https://api.app.net/streams"}, app_token)
       |> ResultParser.convert_to(:map)
-  	HTTPoison.get(endpoint, [{"Authorization", "Bearer #{app_token}"}], timeout: :infinity, stream_to: self())
-  	{:reply, :ok, %{app_token: app_token, stream_id: stream_id}}
+    HTTPoison.get(endpoint, [{"Authorization", "Bearer #{app_token}"}], timeout: :infinity, stream_to: self())
+    {:reply, :ok, %{app_token: app_token, stream_id: stream_id}}
   end
 
   @doc """
@@ -65,16 +65,16 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
   end
 
   def handle_call({:close}, _from, %{app_token: app_token, stream_id: stream_id} = state) do
-  	#This returns no_content when it succeeds
-  	result = Http.call({:delete, "https://api.app.net/streams/#{stream_id}"}, [{"Authorization", "Bearer #{app_token}"}])
-  	case result do
-  		{:error, :no_content} -> {:reply, {:ok}, %{}}
-  		_ -> {:reply, {:halt, self}, state }
-  	end
+    #This returns no_content when it succeeds
+    result = Http.call({:delete, "https://api.app.net/streams/#{stream_id}"}, [{"Authorization", "Bearer #{app_token}"}])
+    case result do
+      {:error, :no_content} -> {:reply, {:ok}, %{}}
+      _ -> {:reply, {:halt, self}, state }
+    end
   end
 
   def handle_call({:close}, _from, _state) do
-  	#Stream  wasn't created so don't worry about closing it
-  	{:reply, {:ok}, %{}}
+    #Stream  wasn't created so don't worry about closing it
+    {:reply, {:ok}, %{}}
   end
 end

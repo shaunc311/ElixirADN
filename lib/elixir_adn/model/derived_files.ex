@@ -1,7 +1,7 @@
 defmodule ElixirADN.Model.DerivedFiles do
-	@doc ~S"""
-	An elixir representation of the ADN derived files map
-	{
+  @doc ~S"""
+  An elixir representation of the ADN derived files map
+  {
     "image_thumb_200s": {
       "image_info": {
         "width": 200,
@@ -27,6 +27,6 @@ defmodule ElixirADN.Model.DerivedFiles do
       "url_expires": "2013-01-25T03:00:00Z"
     }
   }
-	"""
-	defstruct image_thumb_200s: nil, image_thumb_960r: nil
+  """
+  defstruct image_thumb_200s: nil, image_thumb_960r: nil
 end

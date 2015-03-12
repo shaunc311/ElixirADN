@@ -1,7 +1,7 @@
 defmodule ElixirADN.Model.ImageThumb do
-	@doc ~S"""
-	An elixir representation of the ADN image thumbmap
-	{
+  @doc ~S"""
+  An elixir representation of the ADN image thumbmap
+  {
     "image_info": {
       "width": 200,
       "height": 200
@@ -13,6 +13,6 @@ defmodule ElixirADN.Model.ImageThumb do
     "url": "https://example.com/thumbnail_200s.png",
     "url_expires": "2013-01-25T03:00:00Z"
   }
-	"""
-	defstruct image_info: nil, name: "", mime_type: "", sha1: "", size: -1, url: "", url_expires: ""
+  """
+  defstruct image_info: nil, name: "", mime_type: "", sha1: "", size: -1, url: "", url_expires: ""
 end

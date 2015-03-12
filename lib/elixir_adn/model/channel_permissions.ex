@@ -1,7 +1,7 @@
 defmodule ElixirADN.Model.ChannelPermissions do
-	@doc ~S"""
-	An elixir representation of the ADN channel reader/writer/editor permissions
-	{
+  @doc ~S"""
+  An elixir representation of the ADN channel reader/writer/editor permissions
+  {
     "any_user": false,
     "immutable": false,
     "public": true,
@@ -10,6 +10,6 @@ defmodule ElixirADN.Model.ChannelPermissions do
     ],
     "you": true
   }
-	"""
-	defstruct any_user: false, immutable: false, public: false, user_ids: [], you: false 
+  """
+  defstruct any_user: false, immutable: false, public: false, user_ids: [], you: false 
 end

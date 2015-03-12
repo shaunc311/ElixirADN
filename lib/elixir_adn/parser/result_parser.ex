@@ -30,8 +30,7 @@ defmodule ElixirADN.Parser.ResultParser do
 	data is ever needed it can be pulled from this map as well.
 	"""
 	def convert_to(%HTTPoison.Response{body: body}, :map) do
-		map = parse(body)
-		{:ok, map}
+		parse(body)
 	end
 
 	def convert_to(%HTTPoison.Response{body: body}, as) when is_atom(as) do
@@ -76,10 +75,10 @@ defmodule ElixirADN.Parser.ResultParser do
 	#A stream can get any kind of object back so test for
 	#attributes
 	defp decode({:ok, value}, :stream) do
-		is_message = Map.has_key?({:ok, value}, "channel_id")
-  	is_user = Map.has_key?({:ok, value}, "username")
-  	is_channel = Map.has_key?({:ok, value}, "owner")
-  	is_post = Map.has_key?({:ok, value}, "num_reposts")
+		is_message = Map.has_key?(value, "channel_id")
+  	is_user = Map.has_key?(value, "username")
+  	is_channel = Map.has_key?(value, "owner")
+  	is_post = Map.has_key?(value, "num_reposts")
   	cond do
   		is_message -> decode({:ok, value}, Message)
   		is_user -> decode({:ok, value}, User)

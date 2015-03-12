@@ -37,6 +37,7 @@ defmodule ElixirADN.Behaviours.Bot do
 	"""
 	def start_bot(bot_logic, username, auth_token, %StreamEndpointParameters{} = endpoint_parameters, subscriptions) when is_list(subscriptions) do
 		UserStream.stream(auth_token, bot_logic, endpoint_parameters, subscriptions)
+			|> Stream.map( fn({:ok, [value]} -> value) end)
 			|> Stream.filter( fn(x) -> not_from_bot?(username,x) end)
 			|> Stream.filter( fn(x) -> mentions_bot?(username,x) end)
 			|> Enum.map( fn(x) -> call_into_bot( bot_logic, x) end)

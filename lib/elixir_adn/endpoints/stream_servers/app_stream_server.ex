@@ -48,7 +48,7 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
   """
   def handle_call({:setup_stream, app_token, stream_parameters}, _from, _state) do
   	#we need to create the stream to get the url
-  	%{"endpoint" => endpoint, "id" => stream_id} = ElixirADN.Endpoints.Parameters.Encoder.generate_json(stream_parameters)
+  	{:ok, %{"endpoint" => endpoint, "id" => stream_id}} = ElixirADN.Endpoints.Parameters.Encoder.generate_json(stream_parameters)
       |> Http.call({:post, "https://api.app.net/streams"}, app_token)
       |> ResultParser.convert_to(:map)
   	HTTPoison.get(endpoint, [{"Authorization", "Bearer #{app_token}"}], timeout: :infinity, stream_to: self())

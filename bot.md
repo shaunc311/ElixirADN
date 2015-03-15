@@ -18,14 +18,13 @@ defmodule MagicEightBallBot do
     :ok
   end
 
-  defp respond_to_post(post) do
+  defp respond_to_post(original_post) do
     #Create a post to respond to the user with
   	post = get_magic_response
-  	  |> prepend_user(post)
-  	  |> create_post(post)
-  	
-  	#I typically store the auth token in an agent but you can do whatever
-  	ElixirADN.Endpoints.Post.create_post("auth_token", post)
+  	  |> prepend_user(original_post)
+  	  |> create_response()
+  	  #I typically store the auth token in an agent but you can do whatever
+  	  |> ElixirADN.Helpers.ResponseHelper.respond(original_post, "auth_token")
   end
 
   #Use a combination of magic and science to get the correct
@@ -49,8 +48,8 @@ defmodule MagicEightBallBot do
   end
 
   #Create a post to respond to the initial post
-  defp create_post(response, post) do
-  	%ElixirADN.Model.Post{ text: response, reply_to: post.id}
+  defp create_response(response) do
+  	%ElixirADN.Model.Response{ text: response}
   end
 end
 ```

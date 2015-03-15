@@ -9,9 +9,16 @@ endpoints.
 ###Create a message
 Creates a message that says "hi"
 ```elixir
-post = %ElixirADN.Model.Message{text: "hi"}
-ElixirADN.Endpoints.Channel.create_message("user_token", post)
+%ElixirADN.Model.Message{text: "hi"}
+  }> ElixirADN.Endpoints.Channel.create_message("user_token")
 ```
+
+###Respond to a message 'original_message' with "hi"
+```elixir
+%ElixirADN.Model.Response{text: "hi"}
+  }> ElixirADN.Helpers.ResponseHelper.resond(original_message, "user_token")
+```
+
 ##Filter
 ###Get all
 Get every filter a user has created
@@ -22,7 +29,7 @@ ElixirADN.Endpoints.Filter.get("user_token")
 ###Get a filter
 Get a specific filter a user has created by id
 ```elixir
-ElixirADN.Endpoints.Filter.get("user_token", "filter_id")
+ElixirADN.Endpoints.Filter.get("filter_id", "user_token")
 ```
 ###Create
 Create a filter to show all posts by the client Dragoon
@@ -31,18 +38,17 @@ clause = %ElixirADN.Model.Clause{field: "/data/source/client_id",
 object_type: "post", operator: "matches", 
 value: "KEWBRxq3j5fGvMZ52VPnZKvhxxZHVyZE"}
 
-filter = %ElixirADN.Model.Filter{clauses: [clause], 
+%ElixirADN.Model.Filter{clauses: [clause], 
 match_policy: "include_any", name: "DragoonClient"}
-
-Filter.create_filter("user_token", filter)
+  |> Filter.create_filter("user_token")
 ```
 
 ##Global
 ###Create a post 
 Create a post or reply
 ```elixir
-post = %ElixirADN.Model.Post{text: "hi"}
-ElixirADN.Endpoints.Post.create_post("user_token", post)
+%ElixirADN.Model.Post{text: "hi"}
+  |> ElixirADN.Endpoints.Post.create_post("user_token")
 ```
 
 ###Get global posts
@@ -73,9 +79,9 @@ Get the posts for a user
 Get the posts mentioning a user
 ```elixir
 {:ok, posts } = ElixirADN.Endpoints.User.get_mentions("@username", 
-"user_token",
 %ElixirADN.Endpoints.Parameters.PostParameters{},
-%ElixirADN.Endpoints.Parameters.Pagination{})
+%ElixirADN.Endpoints.Parameters.Pagination{}, 
+user_token)
 ```
 
 #Streams
@@ -84,13 +90,13 @@ App streams are regular elixir streams that monitor ADN with filters.
 To create an app stream you need an app token and some parameters.  This
 example will read 1 dragoon post from ADN:
 ```elixir
-params = %ElixirADN.Endpoints.Parameters.AppStreamParameters{
+%ElixirADN.Endpoints.Parameters.AppStreamParameters{
   object_types: ["post"],
   type: "long_poll",
   filter_id: [whatever filter_id you created in the Create Filter example above],
   key: "dragoon_stream_test"
 }
-ElixirADN.Endpoints.AppStream.stream("app_token", params)
+  |> ElixirADN.Endpoints.AppStream.stream("app_token")
   |> Enum.take(1)
 ```
 
@@ -103,19 +109,19 @@ to see all the possibilities.  Here is quick example to stream a users mentions:
 ```elixir
 stream_params = %ElixirADN.Endpoints.Parameters.StreamEndpointParameters{}
 subscription_params = %ElixirADN.Endpoints.Parameters.SubscriptionParameters{}
-ElixirADN.Endpoints.UserStream.stream("user_token", :mentions_stream_id, 
-  stream_parameters,[{:my_mentions, subscription_parameters}])
+ElixirADN.Endpoints.UserStream.stream(:mentions_stream_id, 
+  stream_parameters,[{:my_mentions, subscription_parameters}], "user_token")
   |> Enum.take(1)
 ```
 A stream can only have 1 StreamEndpointParameters, but each subscription can
 have it's own SubscriptionParameters.  
 
 #Bot Behaviour
-A way to create bots that listen to user streams and can act on them.  To create a bot use the Bot behaviour like below:
+A way to create bots that listen to user streams and can act on them.  To create a bot use the Bot behaviour like below (or read the [bot.me document](bot.md) for more info):
 
 ```elixir
 defmodule ExampleBot do
-	@behaviour ElixirADN.Behaviours.Bot
+  @behaviour ElixirADN.Behaviours.Bot
 ```
 
 The behaviour requires implementation of:

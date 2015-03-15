@@ -10,7 +10,7 @@ defmodule ElixirADN.Helpers.ResponseHelperTest do
 
   test_with_mock "respond to message", %{doc: doc}, HTTPoison, [:passthrough],
     [post!: fn(_url, _body, _headers) -> doc end] do
-    result = ElixirADN.Helpers.ResponseHelper.respond("token", %ElixirADN.Model.Response{text: "response"}, %ElixirADN.Model.Message{text: "blah", channel_id: "hi", id: "15"})
+    result = ElixirADN.Helpers.ResponseHelper.respond(%ElixirADN.Model.Response{text: "response"}, %ElixirADN.Model.Message{text: "blah", channel_id: "hi", id: "15"}, "token")
     expected_body = ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Message{text: "response", reply_to: "15", channel_id: "hi"})
     
     assert result == doc
@@ -19,7 +19,7 @@ defmodule ElixirADN.Helpers.ResponseHelperTest do
 
   test_with_mock "respond to post", %{doc: doc}, HTTPoison, [:passthrough],
     [post!: fn(_url, _body, _headers) -> doc end] do
-    result = ElixirADN.Helpers.ResponseHelper.respond("token", %ElixirADN.Model.Response{text: "response"}, %ElixirADN.Model.Post{text: "blah", id: "15"})
+    result = ElixirADN.Helpers.ResponseHelper.respond(%ElixirADN.Model.Response{text: "response"}, %ElixirADN.Model.Post{text: "blah", id: "15"}, "token")
     expected_body = ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Post{text: "response", reply_to: "15"})
     
     assert result == doc

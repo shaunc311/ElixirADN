@@ -22,7 +22,7 @@ defmodule ElixirADN.Endpoints.FilterTest do
   test_with_mock "get a filter", %{doc: doc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Authorization", "Bearer token"}, {"Content-Type", "application/json"}]) -> doc end] do
 
-    {:ok, posts} = Filter.get("token", "id")
+    {:ok, posts} = Filter.get("id", "token")
     
     assert called HTTPoison.get!("https://api.app.net/filters/id", [{"Authorization", "Bearer token"}, {"Content-Type", "application/json"}])
     assert Enum.count(posts) == 1
@@ -33,7 +33,7 @@ defmodule ElixirADN.Endpoints.FilterTest do
 
     clause = %ElixirADN.Model.Clause{field: "/data/entities/hashtags/*/name", object_type: "post", operator: "matches", value: "Dragoon"}
     filter = %ElixirADN.Model.Filter{clauses: [clause], match_policy: "include_any", name: "DragoonHashtag"}
-    Filter.create_filter("token", filter)
+    Filter.create_filter(filter, "token")
     
     filter_body = ElixirADN.Endpoints.Parameters.Encoder.generate_json(filter)
     assert called HTTPoison.post!("https://api.app.net/filters", filter_body, [{"Authorization", "Bearer token"}, {"Content-Type", "application/json"}])

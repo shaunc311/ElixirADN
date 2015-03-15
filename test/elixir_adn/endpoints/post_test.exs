@@ -12,7 +12,7 @@ defmodule ElixirADN.Endpoints.PostTest do
 
   test_with_mock "create post", %{doc: doc}, HTTPoison, [:passthrough],
     [post!: fn(_url, _body, _headers) -> doc end] do
-    result = ElixirADN.Endpoints.Post.create_post("token", %ElixirADN.Model.Post{text: "blah"})
+    result = ElixirADN.Endpoints.Post.create_post(%ElixirADN.Model.Post{text: "blah"}, "token")
     expected_body = ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Post{text: "blah"})
     
     assert result == doc

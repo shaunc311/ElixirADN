@@ -16,7 +16,7 @@ defmodule ElixirADN.Endpoints.AppStream do
   Streams ADN.  Based on the post by Benjamin Tam:
   http://benjamintan.io/blog/2015/02/05/how-to-build-streams-in-elixir-easily-with-stream-resource-awesomeness/
   """
-  def stream(app_token, %AppStreamParameters{} = stream_parameters) do
+  def stream(%AppStreamParameters{} = stream_parameters, app_token) do
     Stream.resource( 
       #The initial state function
       fn -> create_stream(app_token, stream_parameters) end,

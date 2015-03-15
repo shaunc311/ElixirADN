@@ -7,16 +7,16 @@ defmodule ElixirADN.Helpers.ResponseHelper do
   @doc ~S"""
   A helper to respond to a post
   """
-  def respond(user_token, %ElixirADN.Model.Response{} = response, %ElixirADN.Model.Post{} = original_post) do
-    post = %ElixirADN.Model.Post{ entities: response.entities, machine_only: response.machine_only, reply_to: original_post.id, text: response.text, annotations: response.annotations}
-    ElixirADN.Endpoints.Post.create_post(user_token, post)
+  def respond(%ElixirADN.Model.Response{} = response, %ElixirADN.Model.Post{} = original_post, user_token) do
+    %ElixirADN.Model.Post{ entities: response.entities, machine_only: response.machine_only, reply_to: original_post.id, text: response.text, annotations: response.annotations}
+      |> ElixirADN.Endpoints.Post.create_post(user_token)
   end
 
   @doc ~S"""
   A helper to respond to a message in a channel
   """
-  def respond(user_token, %ElixirADN.Model.Response{} = response, %ElixirADN.Model.Message{} = original_message) do
-    message = %ElixirADN.Model.Message{ channel_id: original_message.channel_id, entities: response.entities, machine_only: response.machine_only, reply_to: original_message.id, text: response.text, annotations: response.annotations}
-    ElixirADN.Endpoints.Channel.create_message(user_token, message)
+  def respond(%ElixirADN.Model.Response{} = response, %ElixirADN.Model.Message{} = original_message, user_token) do
+    %ElixirADN.Model.Message{ channel_id: original_message.channel_id, entities: response.entities, machine_only: response.machine_only, reply_to: original_message.id, text: response.text, annotations: response.annotations}
+      |> ElixirADN.Endpoints.Channel.create_message(user_token)
   end 
 end

@@ -10,7 +10,7 @@ defmodule ElixirADN.Endpoints.ChannelTest do
 
   test_with_mock "create message", %{doc: doc}, HTTPoison, [:passthrough],
     [post!: fn(_url, _body, _headers) -> doc end] do
-    result = ElixirADN.Endpoints.Channel.create_message("token", %ElixirADN.Model.Message{text: "blah", channel_id: "hi"})
+    result = ElixirADN.Endpoints.Channel.create_message(%ElixirADN.Model.Message{text: "blah", channel_id: "hi"}, "token")
     expected_body = ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Model.Message{text: "blah", channel_id: "hi"})
     
     assert result == doc

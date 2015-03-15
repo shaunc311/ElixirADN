@@ -36,7 +36,7 @@ defmodule ElixirADN.Endpoints.UserTest do
   test_with_mock "get mentions", %{doc: doc}, HTTPoison, [:passthrough],
     [get!: fn(_url, [{"Authorization", "Bearer token"},{"Content-Type", "application/json"}]) -> doc end] do
 
-    {:ok, posts} = User.get_mentions("@shauncollins", "token", %PostParameters{include_muted: true}, %Pagination{})
+    {:ok, posts} = User.get_mentions("@shauncollins", %PostParameters{include_muted: true}, %Pagination{}, "token")
     
     assert called HTTPoison.get!("https://api.app.net/users/@shauncollins/mentions?include_muted=1", [{"Authorization", "Bearer token"},{"Content-Type", "application/json"}])
     assert Enum.count(posts) == 1

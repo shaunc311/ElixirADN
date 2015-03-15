@@ -15,7 +15,7 @@ defmodule ElixirADN.Endpoints.Post do
   @doc ~S"""
   Post to ADN.  This requests a user token.
   """
-  def create_post(user_token, %Post{} = post) when is_binary(user_token) do
+  def create_post(%Post{} = post, user_token) when is_binary(user_token) do
     Encoder.generate_json(post)
       |> Http.call({:post, "https://api.app.net/posts"}, user_token)
   end

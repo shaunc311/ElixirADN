@@ -50,7 +50,7 @@ defmodule ElixirADN.Endpoints.UserStream do
   Streams ADN endpoints.  Based on the post by Benjamin Tam:
   http://benjamintan.io/blog/2015/02/05/how-to-build-streams-in-elixir-easily-with-stream-resource-awesomeness/
   """
-  def stream(user_token, stream_id, %StreamEndpointParameters{} = stream_parameters, subscription_urls) when is_atom(stream_id) do
+  def stream(stream_id, %StreamEndpointParameters{} = stream_parameters, subscription_urls, user_token) when is_atom(stream_id) do
     Stream.resource( 
       #The initial state function
       fn -> create_stream(user_token, stream_id, stream_parameters, subscription_urls) end,

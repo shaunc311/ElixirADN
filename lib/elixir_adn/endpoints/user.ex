@@ -38,7 +38,7 @@ defmodule ElixirADN.Endpoints.User do
   passed in.  A token (app or user) is required and the user_id can be either the 
   @username format or a numerical id
   """
-  def get_mentions(user_id, token, %PostParameters{} = post_parameters, %Pagination{} = pagination) when is_binary(user_id) or is_integer(user_id) do
+  def get_mentions(user_id, %PostParameters{} = post_parameters, %Pagination{} = pagination, token) when is_binary(user_id) or is_integer(user_id) do
     {:ok, query_string} = Encoder.generate_query_string([post_parameters, pagination])
     Http.call({:get, "https://api.app.net/users/#{user_id}/mentions#{query_string}"}, token)
       |> ResultParser.convert_to(ElixirADN.Model.Post)

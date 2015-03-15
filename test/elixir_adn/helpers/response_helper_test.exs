@@ -1,9 +1,9 @@
 defmodule ElixirADN.Helpers.ResponseHelperTest do
-	use ExUnit.Case, async: false
+  use ExUnit.Case, async: false
 
   import Mock
 
-	setup_all do 
+  setup_all do 
     doc = %HTTPoison.Response{ status_code: 200, body: "", headers: [] }
     {:ok, doc: doc}
   end

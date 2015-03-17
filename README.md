@@ -10,13 +10,13 @@ endpoints.
 Creates a message that says "hi"
 ```elixir
 %ElixirADN.Model.Message{text: "hi"}
-  }> ElixirADN.Endpoints.Channel.create_message("user_token")
+  |> ElixirADN.Endpoints.Channel.create_message("user_token")
 ```
 
 ###Respond to a message 'original_message' with "hi"
 ```elixir
 %ElixirADN.Model.Response{text: "hi"}
-  }> ElixirADN.Helpers.ResponseHelper.resond(original_message, "user_token")
+  |> ElixirADN.Helpers.ResponseHelper.resond(original_message, "user_token")
 ```
 
 ##Filter

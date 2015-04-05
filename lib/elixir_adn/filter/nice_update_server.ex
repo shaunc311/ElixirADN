@@ -29,7 +29,7 @@ defmodule ElixirADN.Filter.NiceUpdateServer do
   """
   def init({:ok, nice_server}) do
     update_rankings(nice_server)
-    :timer.apply_interval(5*60*1000, ElixirADN.Filter.NiceUpdateServer, :check_for_update, [self])
+    :timer.apply_interval(60*60*1000, ElixirADN.Filter.NiceUpdateServer, :check_for_update, [self])
     {:ok, %{nice_server: nice_server}}
   end
 

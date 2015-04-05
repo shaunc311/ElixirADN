@@ -26,8 +26,8 @@ defmodule ElixirADN.Filter.NiceServer do
 
   Returns `{:ok, true/false}` 
   """
-  def is_human?(server, username) do
-    GenServer.call(server, {:is_human, username})
+  def is_human?(server, type, username) do
+    GenServer.call(server, {:is_human, type, username})
   end
 
   @doc """
@@ -66,12 +66,17 @@ defmodule ElixirADN.Filter.NiceServer do
   Get the rank for a user and check to see if the rankings need to be
   updated
   """
-  def handle_call({:is_human, username}, _from, state) do
+  def handle_call({:is_human, "human", username}, _from, state) do
     value = case HashDict.fetch(state, username) do
       {:ok, user_value} -> {:ok, Map.get(user_value, "is_human") == "Y"}
       :error -> {:ok, :no_user}
     end
     {:reply, value, state}
+  end
+
+  #if it's not a human, skip it
+  def handle_call({:is_human, _, _username}, _from, state) do
+    {:reply, {:ok, false}, state}
   end
 
   @doc """

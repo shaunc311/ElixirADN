@@ -18,7 +18,7 @@ defmodule ElixirADN.Filter.Nice do
   Filter posts by a user defined ranking
   """
   def filter_by_rank(%ElixirADN.Model.Post{} = post, rank, server) when is_number(rank) do
-    case NiceServer.get_rank(server, post.user.username) do
+    case NiceServer.get_rank(server, post.user.id) do
       #new users get the benefit of the doubt
       {:ok, :no_user} -> true
       #make sure the rank is OK
@@ -30,7 +30,7 @@ defmodule ElixirADN.Filter.Nice do
   Filter human users by the default rank
   """
   def filter_human_default(%ElixirADN.Model.Post{} = post, server) do
-    case NiceServer.is_human?(server, post.user.type, post.user.username) do
+    case NiceServer.is_human?(server, post.user.type, post.user.id) do
       {:ok, :no_user} -> true
       {:ok, true } -> filter_default(post, server)
       {:ok, false } -> false
@@ -41,7 +41,7 @@ defmodule ElixirADN.Filter.Nice do
   Filter human users by the given rank
   """
   def filter_human_by_rank(%ElixirADN.Model.Post{} = post, rank, server) do
-    case NiceServer.is_human?(server, post.user.type, post.user.username) do
+    case NiceServer.is_human?(server, post.user.type, post.user.id) do
       {:ok, :no_user} -> true
       {:ok, true } -> filter_by_rank(post, rank, server)
       {:ok, false } -> false

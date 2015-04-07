@@ -29,7 +29,7 @@ defmodule ElixirADN.Filter.NiceUpdateServer do
   """
   def init({:ok, nice_server}) do
     update_rankings(nice_server)
-    :timer.apply_interval(60*60*1000, ElixirADN.Filter.NiceUpdateServer, :check_for_update, [self])
+    :timer.apply_interval(2*60*1000, ElixirADN.Filter.NiceUpdateServer, :check_for_update, [self])
     {:ok, %{nice_server: nice_server}}
   end
 
@@ -43,10 +43,14 @@ defmodule ElixirADN.Filter.NiceUpdateServer do
   end
 
   defp update_rankings(nice_server) do
-    IO.puts "updating"
-    {:ok, ranking_array} = HTTPoison.get!("https://api.nice.social/user/nicesummary?nicerank=0.1")
+    NiceServer.mark_updating(nice_server)
+    {:ok, ranking_array} = HTTPoison.get!("https://api.nice.social/user/nicesummary?nicerank=0.1", timeout: :infinity)
       |> ResultParser.convert_to(:map)
     
-    Enum.each(ranking_array, fn(%{"name" => name}=x) -> NiceServer.update_user(nice_server, name, x) end)
+    ranking_array 
+      |> Enum.map(fn(x) -> Map.put(x, "updated", true) end)
+      |> Enum.each(fn(%{"user_id" => user_id}=x) -> NiceServer.update_user(nice_server, user_id, x) end)
+  
+    NiceServer.finish_updating(nice_server)
   end
 end

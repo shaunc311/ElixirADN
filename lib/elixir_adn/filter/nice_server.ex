@@ -19,7 +19,7 @@ defmodule ElixirADN.Filter.NiceServer do
   {:ok, :no_user} if no user is found
   """
   def get_rank(server, user_id) do
-    GenServer.call(server, {:get_rank, user_id})
+    GenServer.call(server, {:get_rank, user_id}, :infinity)
   end
 
   @doc """
@@ -28,7 +28,7 @@ defmodule ElixirADN.Filter.NiceServer do
   Returns `{:ok, true/false}` 
   """
   def is_human?(server, type, user_id) do
-    GenServer.call(server, {:is_human, type, user_id})
+    GenServer.call(server, {:is_human, type, user_id},  :infinity)
   end
 
   @doc """
@@ -37,7 +37,7 @@ defmodule ElixirADN.Filter.NiceServer do
   Returns `{:ok}` 
   """
   def update_user(server, user_id, user_value) do
-    GenServer.call(server, {:update_user, user_id, user_value})
+    GenServer.call(server, {:update_user, user_id, user_value},  :infinity)
   end
 
   @doc """
@@ -46,7 +46,7 @@ defmodule ElixirADN.Filter.NiceServer do
   Returns `{:ok}` 
   """
   def mark_updating(server) do
-    GenServer.call(server, {:begin_update})
+    GenServer.call(server, {:begin_update},  :infinity)
   end
 
   @doc """
@@ -55,7 +55,7 @@ defmodule ElixirADN.Filter.NiceServer do
   Returns `{:ok}` 
   """
   def finish_updating(server) do
-    GenServer.call(server, {:finish_update})
+    GenServer.call(server, {:finish_update},  :infinity)
   end
 
 
@@ -150,7 +150,7 @@ defmodule ElixirADN.Filter.NiceServer do
   end
 
   defp get_user_from_nice(user_id) do
-    {:ok, ranking_array} = HTTPoison.get!("http://api.nice.social/user/nicerank?ids=#{user_id}")
+    {:ok, ranking_array} = HTTPoison.get!("http://api.nice.social/user/nicerank?ids=#{user_id}", timeout: :infinity)
       |> ResultParser.convert_to(:map)
     
     first_result = ranking_array 

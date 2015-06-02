@@ -37,6 +37,10 @@ defmodule ElixirADN.Filter.Nice do
     end
   end
 
+  def filter_human_default(nil, server) do
+    false
+  end
+
   @doc ~S"""
   Filter human users by the given rank
   """

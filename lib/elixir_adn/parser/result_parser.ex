@@ -51,10 +51,18 @@ defmodule ElixirADN.Parser.ResultParser do
 
   
   defp parse(body) when is_binary(body) do
-    result = body
-      |> Poison.decode!
-      |> Map.get("data")
-    {:ok, result}
+    try do 
+      result = body
+        |> Poison.decode!
+        |> Map.get("data")
+      {:ok, result}
+    rescue
+      e in Poison.SyntaxError -> 
+        IO.puts "ERROR IN:"
+        IO.puts body
+        {:ok, nil}
+        #throw e
+    end
   end
 
   #Decode data into model objects using the Poison library.  Lists

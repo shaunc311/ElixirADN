@@ -386,4 +386,39 @@ defmodule ElixirADN.Parser.ResultParserTest do
     assert client_id == "98765zyxw"
   end
 
+  test "parse map", %{files: files} do
+    {:ok, map} = ResultParser.convert_to(files, :map)
+    assert Map.get(map, "complete") == true
+  end
+
+  test "parse as binary", %{files: files} do
+    {:ok, file} = ResultParser.convert_to(files.body, ElixirADN.Model.File)
+    assert file.complete == true
+  end
+
+  test "parse invalid json" do
+    {:ok, result} = ResultParser.convert_to("ahhhh }", ElixirADN.Model.File)
+    assert result == nil
+  end
+
+  test "parse posts stream", %{posts: posts} do
+    {:ok, [post]} = ResultParser.convert_to(posts, :stream)
+    assert post.id == "914440"
+  end
+
+  test "parse messages stream", %{messages: messages} do
+    {:ok, [message]} = ResultParser.convert_to(messages, :stream)
+    assert message.id == "1"
+  end
+
+  test "parse user stream", %{users: users} do
+    {:ok, [user1, _user2]} = ResultParser.convert_to(users, :stream)
+    assert user1.id == "2"
+  end
+
+  test "parse channel stream", %{channels: channels} do
+    {:ok, [channel1, _channel2]} = ResultParser.convert_to(channels, :stream)
+    assert channel1.id == "2"
+  end
+
 end

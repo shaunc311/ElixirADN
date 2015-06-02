@@ -51,8 +51,8 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
     {:ok, %{"endpoint" => endpoint, "id" => stream_id}} = ElixirADN.Endpoints.Parameters.Encoder.generate_json(stream_parameters)
       |> Http.call({:post, "https://api.app.net/streams"}, app_token)
       |> ResultParser.convert_to(:map)
-    HTTPoison.get(endpoint, [{"Authorization", "Bearer #{app_token}"}], timeout: :infinity, stream_to: self())
-    {:reply, :ok, %{app_token: app_token, stream_id: stream_id}}
+    {:ok, %HTTPoison.AsyncResponse{id: ref}} = HTTPoison.get(endpoint, [{"Authorization", "Bearer #{app_token}"}], timeout: :infinity, stream_to: self())
+    {:reply, :ok, %{app_token: app_token, stream_id: stream_id, hackney_ref: ref}}
   end
 
   @doc """
@@ -60,8 +60,12 @@ defmodule ElixirADN.Endpoints.StreamServers.AppStreamServer do
   return it, otherwise recurse until we get a valid item
   """
   def handle_call({:get_next_item}, _from, state) do
-    items = ElixirADN.Endpoints.StreamServers.Receiver.receive_message()
-    {:reply, {items, self}, state}
+    items = ElixirADN.Endpoints.StreamServers.Receiver.receive_message(self, state.hackney_ref)
+    receive do
+      {:parsed, items} -> 
+        {:reply, {items, self}, state}
+    end
+    
   end
 
   def handle_call({:close}, _from, %{app_token: app_token, stream_id: stream_id} = state) do

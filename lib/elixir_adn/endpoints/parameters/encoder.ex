@@ -111,9 +111,10 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
     encode_parameters(pagination)
   end
 
-  defp convert_to_query_string(%Post{} = post) do
-    encode_parameters(post)
-  end
+  #Why did I add this?
+  #defp convert_to_query_string(%Post{} = post) do
+  #  encode_parameters(post)
+  #end
 
   defp convert_to_query_string(%StreamEndpointParameters{} = stream_parameters) do
     encode_parameters(stream_parameters)
@@ -170,6 +171,9 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
       
       iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Endpoints.Parameters.AppStreamParameters{object_types: ["object_types"], type: "type", filter_id: "filter_id", key: "key"}) |> IO.iodata_to_binary
       "{\"type\":\"type\",\"object_types\":[\"object_types\"],\"key\":\"key\",\"filter_id\":\"filter_id\"}"
+
+      iex> ElixirADN.Endpoints.Parameters.Encoder.generate_json(%ElixirADN.Endpoints.Parameters.AppStreamParameters{object_types: ["object_types"], type: "type", filter_id: nil, key: "key"}) |> IO.iodata_to_binary
+      "{\"type\":\"type\",\"object_types\":[\"object_types\"],\"key\":\"key\"}"
       
 
   """
@@ -186,6 +190,11 @@ defmodule ElixirADN.Endpoints.Parameters.Encoder do
   def generate_json(%Filter{name: name, match_policy: match_policy, clauses: clauses}) do
     clauses = Enum.map(clauses, fn(%Clause{field: field, object_type: object_type, operator: operator, value: value}) -> %{field: field, object_type: object_type, operator: operator, value: value} end)
     %{ name: name, match_policy: match_policy, clauses: clauses}
+      |> Poison.Encoder.encode([])
+  end
+
+  def generate_json(%AppStreamParameters{object_types: object_types, type: type, filter_id: nil, key: key}) do
+    %{object_types: object_types, type: type, key: key}
       |> Poison.Encoder.encode([])
   end
 

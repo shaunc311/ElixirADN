@@ -27,7 +27,7 @@ defmodule ElixirADN.Mixfile do
   defp deps do
     [
       {:mock, "~> 0.1.0"},
-      {:httpoison, "~> 0.6.1"},
+      {:httpoison, "~> 0.6.2"},
       {:poison, "~> 1.3.0"}
     ]
   end

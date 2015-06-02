@@ -93,7 +93,7 @@ example will read 1 dragoon post from ADN:
 %ElixirADN.Endpoints.Parameters.AppStreamParameters{
   object_types: ["post"],
   type: "long_poll",
-  filter_id: [whatever filter_id you created in the Create Filter example above],
+  filter_id: [nil or whatever filter_id you created in the Create Filter example above],
   key: "dragoon_stream_test"
 }
   |> ElixirADN.Endpoints.AppStream.stream("app_token")
@@ -141,3 +141,30 @@ ElixirADN.Behaviours.Bot.start_bot(ExampleBot, "@username", "auth_token", %Elixi
 
 The parameters are the bot module name, the bots username, the auth token 
 associated with the account, the parameters to use when creating the user stream, and a list of subscriptions the stream should subscribe to.
+
+#NiceRank Integration
+This is used to filter app or user streams.  Thanks to @matigo for creating nicerank.  This will filter out users based on their ranking.  Current filters are:
+```elixir
+#filters posts with a user nicerank lower than the minimum
+filter_by_rank(%ElixirADN.Model.Post{}, minimum_rank, nice_server_pid)
+
+#filters out all bots and feeds as well as users with a nicerank lower than the default (2.1)
+filter_human_default(%ElixirADN.Model.Post{}, nice_server_pid)
+
+#filters out all bots and feeds as well as users with a nicerank lower than the given value
+filter_human_by_rank(%ElixirADN.Model.Post{}, minimum_rank, nice_server_pid)
+
+#filters posts with a user nicerank lower than the default (2.1)
+filter_default(%ElixirADN.Model.Post{}, nice_server_pid)
+```
+Here is a quick example on how to use it on an app stream.  First you'll need to add ElixirADN.Filter.NiceServer to your supervisor tree somewhere.  Then reference it using the supervisor name in the 2nd parameter to filter_human_default(I used the module name):
+```elixir
+%ElixirADN.Endpoints.Parameters.AppStreamParameters{
+      object_types: ["post"],
+      type: "long_poll",
+      filter_id: nil
+  }
+  |> ElixirADN.Endpoints.AppStream.stream(app_token)
+  |> Stream.filter(fn({:ok, x}) -> ElixirADN.Filter.Nice.filter_human_default(x, ElixirADN.Filter.NiceServer) end )
+  |> Enum.map( fn({:ok, x}) -> IO.inspect x end)
+```
